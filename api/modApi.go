@@ -42,8 +42,10 @@ func (m *ModApi) SearchModList(ctx *gin.Context) {
 func (m *ModApi) GetModInfo(ctx *gin.Context) {
 
 	moId := ctx.Param("modId")
-	modinfo := mod.GetModInfo(moId, ctx)
-
+	modinfo, err, status := mod.GetModInfo(moId)
+	if err != nil {
+		log.Panicln("模组下载失败", "status: ", status)
+	}
 	var mod_config map[string]interface{}
 	json.Unmarshal([]byte(modinfo.ModConfig), &mod_config)
 	mod := map[string]interface{}{
@@ -106,7 +108,7 @@ func (m *ModApi) DeleteMod(ctx *gin.Context) {
 	modId := ctx.Param("modId")
 	db := database.DB
 	db.Where("modid = ?", modId).Delete(&model.ModInfo{})
-
+	// TODO 这里需要更改
 	dstConfig := dstConfigUtils.GetDstConfig()
 	mod_download_path := dstConfig.Mod_download_path
 	mod_path := filepath.Join(mod_download_path, "/steamapps/workshop/content/322330/", modId)

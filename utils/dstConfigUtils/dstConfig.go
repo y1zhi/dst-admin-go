@@ -1,9 +1,11 @@
 package dstConfigUtils
 
 import (
+	"dst-admin-go/config/global"
 	"dst-admin-go/constant/consts"
 	"dst-admin-go/utils/fileUtils"
 	"log"
+	"path/filepath"
 	"strings"
 )
 
@@ -15,6 +17,8 @@ type DstConfig struct {
 	Cluster                    string `json:"cluster"`
 	Backup                     string `json:"backup"`
 	Mod_download_path          string `json:"mod_download_path"`
+	Bin                        int    `json:"bin"`
+	Beta                       bool   `json:"beta"`
 }
 
 const dst_config_path = "./dst_config"
@@ -102,6 +106,9 @@ func GetDstConfig() DstConfig {
 	if dstConfig.Mod_download_path == "" {
 		dstConfig.Backup = consts.KleiDstPath
 	}
+	if dstConfig.Bin == 0 {
+		dstConfig.Bin = 32
+	}
 	return *dstConfig
 }
 
@@ -120,4 +127,5 @@ func SaveDstConfig(dstConfig *DstConfig) {
 	if err != nil {
 		log.Panicln("write dst_config error:", err)
 	}
+	global.Collect.ReCollect(filepath.Join(consts.KleiDstPath, dstConfig.Cluster))
 }

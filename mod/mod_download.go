@@ -84,6 +84,7 @@ func get_mod_info_config(mod_id string, ctx *gin.Context) map[string]interface{}
 		steamcmd := steamcmd_path
 		log.Println("正在下载模组：", path.Join(steamcmd, "steamcmd.sh"), "+login anonymous", "+force_install_dir", mod_download_path, "+workshop_download_item 322330 "+mod_id, "+quit")
 		cmd := exec.Command(path.Join(steamcmd, "steamcmd.sh"), "+login anonymous", "+force_install_dir", mod_download_path, "+workshop_download_item 322330 "+mod_id, "+quit")
+
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			log.Panicln("下载mod失败，请检查steamcmd路径是否配置正确", err)
@@ -333,7 +334,7 @@ func SearchModList(text string, page int, num int) (map[string]interface{}, erro
 	}, nil
 }
 
-func GetModInfo(modID string, ctx *gin.Context) model.ModInfo {
+func GetModInfo(modID string) (model.ModInfo, error, int) {
 	urlStr := "http://api.steampowered.com/IPublishedFileService/GetDetails/v1/"
 	data := url.Values{}
 	data.Set("key", steamAPIKey)
@@ -344,14 +345,14 @@ func GetModInfo(modID string, ctx *gin.Context) model.ModInfo {
 	req, err := http.NewRequest("GET", urlStr, nil)
 	if err != nil {
 		fmt.Println(err)
-		return model.ModInfo{}
+		return model.ModInfo{}, err, 1
 	}
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println(err)
-		return model.ModInfo{}
+		return model.ModInfo{}, err, 2
 	}
 	defer resp.Body.Close()
 
@@ -359,13 +360,13 @@ func GetModInfo(modID string, ctx *gin.Context) model.ModInfo {
 	err = json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
 		fmt.Println(err)
-		return model.ModInfo{}
+		return model.ModInfo{}, err, 3
 	}
 
 	dataList, ok := result["response"].(map[string]interface{})["publishedfiledetails"].([]interface{})
 	if !ok || len(dataList) == 0 {
 		fmt.Println("get mod error")
-		return model.ModInfo{}
+		return model.ModInfo{}, err, 4
 	}
 
 	data2 := dataList[0].(map[string]interface{})
@@ -389,8 +390,22 @@ func GetModInfo(modID string, ctx *gin.Context) model.ModInfo {
 	creator_appid := data2["creator_appid"].(float64)
 	consumer_appid := data2["consumer_appid"].(float64)
 
+	// modInfoRaw := map[string]interface{}{
+	// 	"id":             data2["publishedfileid"].(string),
+	// 	"name":           data2["title"].(string),
+	// 	"last_time":      data2["time_updated"].(int64),
+	// 	"description":    data2["file_description"].(string),
+	// 	"auth":           authorURL,
+	// 	"file_url":       data2["file_url"],
+	// 	"img":            fmt.Sprintf("%s?imw=64&imh=64&ima=fit&impolicy=Letterbox&imcolor=%%23000000&letterbox=true", img),
+	// 	"v":              getVersion(data["tags"]),
+	// 	"creator_appid":  data2["creator_appid"].(int64),
+	// 	"consumer_appid": data2["consumer_appid"].(int64),
+	// 	 "mod_config":     get_mod_info_config(modID),
+	// }
+
 	if modInfo, ok := getModInfoConfig(modID, last_time); ok {
-		return modInfo
+		return modInfo, nil, 0
 	}
 	var fileUrl = ""
 	if file_url != nil {
@@ -425,7 +440,7 @@ func GetModInfo(modID string, ctx *gin.Context) model.ModInfo {
 
 	db := database.DB
 	db.Create(&newModInfo)
-	return newModInfo
+	return newModInfo, nil, 0
 }
 
 func getModInfoConfig(modid string, lastTime float64) (model.ModInfo, bool) {
@@ -484,14 +499,13 @@ func get_v1_mod_info_config(modid, file_url string) map[string]interface{} {
 		break
 	}
 	if tmp.Len() == 0 {
-		log.Println(file_url, "下载失败 3 次，不再尝试")
+		log.Panicln(file_url, "下载失败 3 次，不再尝试")
 		return make(map[string]interface{})
 	}
 	log.Println(file_url, "下载成功，开始解压")
 	zipReader, err := zip.NewReader(bytes.NewReader(tmp.Bytes()), int64(tmp.Len()))
 	if err != nil {
-		log.Println(file_url, "解压失败")
-		log.Println(err)
+		log.Panicln("模组zip 解压失败")
 		return make(map[string]interface{})
 	}
 	for _, file := range zipReader.File {

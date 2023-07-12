@@ -53,7 +53,7 @@ func (g *GameService) UpdateGame(clusterName string) {
 	g.stopMaster(clusterName)
 	g.stopCaves(clusterName)
 	updateGameCMd := dst.GetDstUpdateCmd(clusterName)
-	log.Println("正在更新世界", "cluster: ", "command: ", updateGameCMd)
+	log.Println("正在更新游戏", "cluster: ", clusterName, "command: ", updateGameCMd)
 	_, err := shellUtils.Shell(updateGameCMd)
 	if err != nil {
 		log.Panicln("更新游戏失败: ", err)
@@ -107,7 +107,7 @@ func (g *GameService) launchLevel(clusterName, level string) {
 	dstInstallDir := cluster.ForceInstallDir
 
 	cmd := "cd " + dstInstallDir + "/bin ; screen -d -m -S \"" + screenKey.Key(clusterName, level) + "\"  ./dontstarve_dedicated_server_nullrenderer -console -cluster " + clusterName + " -shard " + level + "  ;"
-	log.Println("正在launch世界", "cluster: ", clusterName, "level: ", level, "command: ", cmd)
+	log.Println("正在启动世界", "cluster: ", clusterName, "level: ", level, "command: ", cmd)
 	_, err := shellUtils.Shell(cmd)
 	if err != nil {
 		log.Panicln("启动 "+clusterName+" "+level+" error,", err)
@@ -211,6 +211,7 @@ func (g *GameService) GetClusterDashboard(clusterName string) vo.ClusterDashboar
 	go func() {
 		defer wg.Done()
 		dashboardVO.CavesStatus = g.GetLevelStatus(clusterName, "Caves")
+
 	}()
 
 	go func() {

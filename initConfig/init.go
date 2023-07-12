@@ -85,6 +85,12 @@ func initLog() {
 
 func initCollect() {
 
+	//var clusters []model.Cluster
+	//database.DB.Find(&clusters)
+	//for _, cluster := range clusters {
+	//	global.CollectMap.AddNewCollect(cluster.ClusterName)
+	//}
+
 	var clusters []model.Cluster
 	database.DB.Find(&clusters)
 	for _, cluster := range clusters {
