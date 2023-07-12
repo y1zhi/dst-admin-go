@@ -4,12 +4,14 @@ import (
 	"dst-admin-go/config/database"
 	"dst-admin-go/mod"
 	"dst-admin-go/model"
+	"dst-admin-go/utils/clusterUtils"
 	"dst-admin-go/utils/dstConfigUtils"
 	"dst-admin-go/utils/fileUtils"
 	"dst-admin-go/vo"
 	"encoding/json"
 	"log"
 	"net/http"
+	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -42,7 +44,7 @@ func (m *ModApi) SearchModList(ctx *gin.Context) {
 func (m *ModApi) GetModInfo(ctx *gin.Context) {
 
 	moId := ctx.Param("modId")
-	modinfo, err, status := mod.GetModInfo(moId)
+	modinfo, err, status := mod.GetModInfo(moId, ctx)
 	if err != nil {
 		log.Panicln("模组下载失败", "status: ", status)
 	}
@@ -108,10 +110,14 @@ func (m *ModApi) DeleteMod(ctx *gin.Context) {
 	modId := ctx.Param("modId")
 	db := database.DB
 	db.Where("modid = ?", modId).Delete(&model.ModInfo{})
-	// TODO 这里需要更改
-	dstConfig := dstConfigUtils.GetDstConfig()
-	mod_download_path := dstConfig.Mod_download_path
-	mod_path := filepath.Join(mod_download_path, "/steamapps/workshop/content/322330/", modId)
+
+	cluster := clusterUtils.GetClusterFromGin(ctx)
+	mod_download_path := cluster.ModDownloadPath
+	if mod_download_path == "" {
+		log.Panicln("请设置模组下载路径")
+	}
+	mod_path := path.Join(mod_download_path, "/steamapps/workshop/content/322330/", modId)
+
 	fileUtils.DeleteDir(mod_path)
 
 	ctx.JSON(http.StatusOK, vo.Response{

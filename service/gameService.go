@@ -274,7 +274,7 @@ func (g *GameService) PsAuxSpecified(clusterName, level string) *vo.DstPsVo {
 
 	info, err := shellUtils.Shell(cmd)
 	if err != nil {
-		log.Panicln(cmd + " error: " + err.Error())
+		log.Println(cmd + " error: " + err.Error())
 		return dstPsVo
 	}
 	if info == "" {

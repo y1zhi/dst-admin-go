@@ -334,7 +334,7 @@ func SearchModList(text string, page int, num int) (map[string]interface{}, erro
 	}, nil
 }
 
-func GetModInfo(modID string) (model.ModInfo, error, int) {
+func GetModInfo(modID string, ctx *gin.Context) (model.ModInfo, error, int) {
 	urlStr := "http://api.steampowered.com/IPublishedFileService/GetDetails/v1/"
 	data := url.Values{}
 	data.Set("key", steamAPIKey)
