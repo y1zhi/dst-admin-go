@@ -53,10 +53,10 @@ func (g *GameLevel2Api) GetStatus(ctx *gin.Context) {
 				}
 			}()
 			world := levelList[index]
-			ps := gameService.PsAuxSpecified(clusterName, world.Uuid)
+			// ps := gameService.PsAuxSpecified(clusterName, world.Uuid)
 			status := gameService.GetLevelStatus(clusterName, world.Uuid)
 			result[index] = LevelInfo{
-				Ps:                ps,
+				Ps:                &vo.DstPsVo{},
 				Status:            status,
 				LevelName:         world.LevelName,
 				IsMaster:          world.IsMaster,
@@ -82,7 +82,7 @@ func (g *GameLevel2Api) Start(ctx *gin.Context) {
 	bin := cluster.Bin
 	beta := cluster.Beta
 	clusterName := cluster.ClusterName
-	gameService.StopLevel(clusterName, levelName)
+	// gameService.StopLevel(clusterName, levelName)
 	gameService.LaunchLevel(clusterName, levelName, bin, beta)
 
 	ctx.JSON(http.StatusOK, vo.Response{

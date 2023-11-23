@@ -82,7 +82,7 @@ func NewMasterServerIni() *ServerIni {
 		ServerPort:     10999,
 		IsMaster:       true,
 		Name:           "Master",
-		Id:             10000,
+		Id:             1,
 		EncodeUserPath: true,
 	}
 }
@@ -92,7 +92,7 @@ func NewCavesServerIni() *ServerIni {
 		ServerPort:         10998,
 		IsMaster:           false,
 		Name:               "Caves",
-		Id:                 10010,
+		Id:                 1,
 		EncodeUserPath:     true,
 		AuthenticationPort: 8766,
 		MasterServerPort:   27016,

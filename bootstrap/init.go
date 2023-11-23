@@ -119,7 +119,7 @@ func initCollect() {
 	home, _ := systemUtils.Home()
 	dstConfig := dstConfigUtils.GetDstConfig()
 	clusterName := dstConfig.Cluster
-	newCollect := collect.NewCollect(filepath.Join(home, ".klei/DoNotStarveTogether", clusterName), clusterName)
+	newCollect := collect.NewCollect(filepath.Join(home, "Documents", "klei", "DoNotStarveTogether", clusterName), clusterName)
 	newCollect.StartCollect()
 	global.Collect = newCollect
 

@@ -1,14 +1,18 @@
 package service
 
 import (
+	"bytes"
 	"dst-admin-go/constant/consts"
 	"dst-admin-go/utils/dstUtils"
 	"dst-admin-go/utils/levelConfigUtils"
 	"dst-admin-go/utils/systemUtils"
+	"fmt"
 	"io"
 	"net/http"
+	"os/exec"
 	"runtime"
 	"strconv"
+	"syscall"
 
 	"dst-admin-go/constant/screenKey"
 	"dst-admin-go/utils/clusterUtils"
@@ -77,13 +81,13 @@ func (g *GameService) UpdateGame(clusterName string) error {
 	g.lock.Lock()
 	defer g.lock.Unlock()
 	// TODO 关闭相应的世界
-	g.StopGame(clusterName)
+	// g.StopGame(clusterName)
 
 	updateGameCMd := dstUtils.GetDstUpdateCmd(clusterName)
 	log.Println("正在更新游戏", "cluster: ", clusterName, "command: ", updateGameCMd)
-	_, err := shellUtils.Shell(updateGameCMd)
+	result, err := shellUtils.ExecuteCommandInWin(updateGameCMd)
+	log.Println(result)
 
-	// TODO 写入 DedicatedServerModsSetup.lua
 	levelConfig, _ := levelConfigUtils.GetLevelConfig(clusterName)
 	for i := range levelConfig.LevelList {
 		level := homeServe.GetLevel(clusterName, levelConfig.LevelList[i].File)
@@ -91,21 +95,34 @@ func (g *GameService) UpdateGame(clusterName string) error {
 		dstUtils.DedicatedServerModsSetup2(clusterName, modoverrides)
 	}
 
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func (g *GameService) GetLevelStatus(clusterName, level string) bool {
-	cmd := " ps -ef | grep -v grep | grep -v tail |grep '" + clusterName + "'|grep " + level + " |sed -n '1P'|awk '{print $2}' "
-	result, err := shellUtils.Shell(cmd)
+	start := time.Now().Nanosecond()
+	// 替换为你要查找的窗口标题
+	targetWindowTitle := clusterName + "_" + level
+
+	// 构建 PowerShell 命令
+	psCommand := fmt.Sprintf("Get-Process | Where-Object { $_.MainWindowTitle -eq '%s' } | Format-Table -Property Id, ProcessName, MainWindowTitle", targetWindowTitle)
+
+	// 执行 PowerShell 命令
+	cmd := exec.Command("powershell", "-Command", psCommand)
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
 	if err != nil {
+		fmt.Println("Error executing PowerShell command:", err)
 		return false
 	}
-	res := strings.Split(result, "\n")[0]
-	log.Println("查询世界状态", cmd, result, res, res != "")
-	return res != ""
+
+	// 打印输出结果
+	// fmt.Println(out.String())
+	// log.Println("查询世界状态", cmd, out.String(), out.String() != "")
+	end := time.Now().Nanosecond()
+	log.Println("消耗时间:", (start-end)/1000)
+	return out.String() != ""
+
 }
 
 func (g *GameService) shutdownLevel(clusterName, level string) {
@@ -139,23 +156,65 @@ func (g *GameService) killLevel(clusterName, level string) {
 	}
 }
 
+func RunCommandInNewWindow(command string) {
+	// 创建一个命令对象
+	cmd := exec.Command("cmd.exe", "/C", "start", "cmd.exe", "/K", command)
+
+	// 设置新窗口属性
+	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+
+	// 启动命令
+	err := cmd.Start()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func (g *GameService) LaunchLevel(clusterName, level string, bin, beta int) {
+
+	//cluster := clusterUtils.GetCluster(clusterName)
+	//dstInstallDir := cluster.ForceInstallDir
+	//
+	//var startCmd = ""
+	//
+	//if bin == 64 {
+	//	dstInstallDir = filepath.Join(dstInstallDir, "bin64", "dontstarve_dedicated_server_nullrenderer_x64")
+	//	startCmd = fmt.Sprintf(`cd /d %s && Start "%s%s" dontstarve_dedicated_server_nullrenderer_x64 -console -cluster %s -shard %s`, dstInstallDir, clusterName, level, clusterName, level)
+	//} else {
+	//	dstInstallDir = filepath.Join(dstInstallDir, "bin")
+	//	startCmd = fmt.Sprintf(`cd /d %s && Start "%s%s" "dontstarve_dedicated_server_nullrenderer -console -cluster %s -shard %s"`, dstInstallDir, clusterName, level, clusterName, level)
+	//}
+	//
+	//log.Println("正在启动世界", "cluster: ", clusterName, "level: ", level, "command: ", startCmd)
+	//result, err := shellUtils.ExecuteCommandInWin("cd /d D:\\dst-dedicated-server\\bin && Start dontstarve_dedicated_server_nullrenderer -console -cluster MyDediServer -shard Master")
+	//log.Println("result", result)
+	//if err != nil {
+	//	log.Panicln("启动 "+clusterName+" "+level+" error,", err)
+	//}
 
 	cluster := clusterUtils.GetCluster(clusterName)
 	dstInstallDir := cluster.ForceInstallDir
-
-	var startCmd = ""
-
+	command := ""
+	title := cluster.ClusterName + "_" + level
 	if bin == 64 {
-		startCmd = "cd " + dstInstallDir + "/bin64 ; screen -d -m -S \"" + screenKey.Key(clusterName, level) + "\"  ./dontstarve_dedicated_server_nullrenderer_x64 -console -cluster " + clusterName + " -shard " + level + "  ;"
+		dstInstallDir = filepath.Join(dstInstallDir, "bin64")
+		command = "cd /d " + dstInstallDir + " && Start \"" + title + "\" dontstarve_dedicated_server_nullrenderer_x64 -console -cluster " + clusterName + " -shard " + level
 	} else {
-		startCmd = "cd " + dstInstallDir + "/bin ; screen -d -m -S \"" + screenKey.Key(clusterName, level) + "\"  ./dontstarve_dedicated_server_nullrenderer -console -cluster " + clusterName + " -shard " + level + "  ;"
+		dstInstallDir = filepath.Join(dstInstallDir, "bin")
+		command = "cd /d " + dstInstallDir + " && Start \"" + title + "\" dontstarve_dedicated_server_nullrenderer -console -cluster " + clusterName + " -shard " + level
 	}
 
-	log.Println("正在启动世界", "cluster: ", clusterName, "level: ", level, "command: ", startCmd)
-	_, err := shellUtils.Shell(startCmd)
+	// 创建一个命令对象
+	cmd := exec.Command("cmd.exe", "/C", command)
+	log.Println(command)
+	// 设置新窗口属性
+	cmd.SysProcAttr = &syscall.SysProcAttr{}
+	cmd.SysProcAttr.CmdLine = "cmd.exe /K " + command
+
+	// 启动命令
+	err := cmd.Start()
 	if err != nil {
-		log.Panicln("启动 "+clusterName+" "+level+" error,", err)
+		log.Panicln(err)
 	}
 
 }
@@ -182,6 +241,7 @@ func (g *GameService) StopLevel(clusterName, level string) {
 	g.killLevel(clusterName, level)
 }
 
+// StopGame TODO 适配windows
 func (g *GameService) StopGame(clusterName string) {
 
 	config, err := levelConfigUtils.GetLevelConfig(clusterName)

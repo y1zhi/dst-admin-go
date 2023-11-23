@@ -4,7 +4,7 @@ import (
 	"dst-admin-go/utils/dstConfigUtils"
 	"dst-admin-go/utils/systemUtils"
 	"fmt"
-	"path"
+	"path/filepath"
 )
 
 var HOME_PATH string
@@ -226,134 +226,15 @@ var (
 	DST_USER_GAME_MASTER_SESSION = DST_MASTER + "/save/session"
 )
 
-// TODO 修改路径
-func GET_START_MASTER_CMD() string {
-	dstConfig := dstConfigUtils.GetDstConfig()
-	cluster := dstConfig.Cluster
-	dst_install_dir := dstConfig.Force_install_dir
-	donot_starve_server_directory := dstConfig.DoNotStarveServerDirectory
-	persistent_storage_root := dstConfig.Persistent_storage_root
-	if donot_starve_server_directory == "" {
-		return "cd " + dst_install_dir + "/bin ; screen -d -m -S \"" + SCREEN_WORK_MASTER_NAME + "\"  ./dontstarve_dedicated_server_nullrenderer -console -cluster " + cluster + " -shard " + DST_MASTER + "  ;"
-	}
-
-	return "cd " + dst_install_dir + "/bin ; screen -d -m -S \"" + SCREEN_WORK_MASTER_NAME + "\"  ./dontstarve_dedicated_server_nullrenderer -console  -persistent_storage_root " + persistent_storage_root + " -conf_dir " + donot_starve_server_directory + " -cluster " + cluster + " -shard " + DST_MASTER + "  ;"
-}
-
-func GET_START_CAVES_CMD() string {
-	dstConfig := dstConfigUtils.GetDstConfig()
-	cluster := dstConfig.Cluster
-	dst_install_dir := dstConfig.Force_install_dir
-	donot_starve_server_directory := dstConfig.DoNotStarveServerDirectory
-	persistent_storage_root := dstConfig.Persistent_storage_root
-	if donot_starve_server_directory == "" {
-		return "cd " + dst_install_dir + "/bin ; screen -d -m -S \"" + SCREEN_WORK_CAVES_NAME + "\"  ./dontstarve_dedicated_server_nullrenderer -console -cluster " + cluster + " -shard " + DST_CAVES + " ;"
-	}
-	return "cd " + dst_install_dir + "/bin ; screen -d -m -S \"" + SCREEN_WORK_CAVES_NAME + "\"  ./dontstarve_dedicated_server_nullrenderer -console -persistent_storage_root " + persistent_storage_root + "-conf_dir " + donot_starve_server_directory + " -cluster " + cluster + " -shard " + DST_CAVES + " ;"
-}
-
-func GET_UPDATE_GAME_CMD() string {
-	dstConfig := dstConfigUtils.GetDstConfig()
-	steamcmd := dstConfig.Steamcmd
-	dst_install_dir := dstConfig.Force_install_dir
-	return "cd " + steamcmd + " ; ./steamcmd.sh +login anonymous +force_install_dir " + dst_install_dir + " +app_update 343050 validate +quit"
-}
-
-func GET_DST_MOD_SETTING_PATH() string {
-	dstConfig := dstConfigUtils.GetDstConfig()
-	dst_install_dir := dstConfig.Force_install_dir
-	return dst_install_dir + "/mods/dedicated_server_mods_setup.lua"
-}
-
-func GET_DST_ADMIN_LIST_PATH() string {
-	dstConfig := dstConfigUtils.GetDstConfig()
-	cluster := dstConfig.Cluster
-	donot_starve_server_directory := dstConfig.DoNotStarveServerDirectory
-	persistent_storage_root := dstConfig.Persistent_storage_root
-	if donot_starve_server_directory == "" {
-		return path.Join(HOME_PATH, ".klei", "DoNotStarveTogether", cluster, "adminlist.txt")
-	}
-	return path.Join(persistent_storage_root, donot_starve_server_directory, cluster, "adminlist.txt")
-}
-
-func GET_DST_BLOCKLIST_PATH() string {
-	dstConfig := dstConfigUtils.GetDstConfig()
-	cluster := dstConfig.Cluster
-	donot_starve_server_directory := dstConfig.DoNotStarveServerDirectory
-	persistent_storage_root := dstConfig.Persistent_storage_root
-	if donot_starve_server_directory == "" {
-		return path.Join(HOME_PATH, ".klei", "DoNotStarveTogether", cluster, "blocklist.txt")
-	}
-	return path.Join(persistent_storage_root, donot_starve_server_directory, cluster, "blocklist.txt")
-}
-
-// TODO 日志 命令
-func GET_DST_MASTER_LOG_PATH() string {
-	return path.Join(GET_DST_USER_GAME_CONFG_PATH(), "Master", "server_log.txt")
-}
-
-func GET_DST_CAVES_LOG_PATH() string {
-	return path.Join(GET_DST_USER_GAME_CONFG_PATH(), "Caves", "server_log.txt")
-}
-
 func GET_DST_USER_GAME_CONFG_PATH() string {
 	dstConfig := dstConfigUtils.GetDstConfig()
 	cluster := dstConfig.Cluster
 	donot_starve_server_directory := dstConfig.DoNotStarveServerDirectory
 	persistent_storage_root := dstConfig.Persistent_storage_root
 	if donot_starve_server_directory == "" {
-		path.Join(HOME_PATH, ".klei/DoNotStarveTogether", cluster)
-		// var path = HOME_PATH + "/.klei/DoNotStarveTogether/" + level + "/"
-		return path.Join(HOME_PATH, ".klei/DoNotStarveTogether", cluster)
+		filepath.Join(HOME_PATH, "Documents", "klei", "DoNotStarveTogether", cluster)
+		return filepath.Join(HOME_PATH, "Documents", "klei", "DoNotStarveTogether", cluster)
 	}
 
-	return path.Join(persistent_storage_root, donot_starve_server_directory, cluster)
-}
-
-func GET_CLUSTER_TOKEN_PATH() string {
-	return path.Join(GET_DST_USER_GAME_CONFG_PATH(), "cluster_token.txt")
-}
-
-func GET_CLUSTER_INI_PATH() string {
-	return path.Join(GET_DST_USER_GAME_CONFG_PATH(), "cluster.ini")
-}
-
-func GET_MASTER_DIR_PATH() string {
-	return path.Join(GET_DST_USER_GAME_CONFG_PATH(), "Master")
-}
-
-func GET_MASTER_DIR_SERVER_INI_PATH() string {
-	return path.Join(GET_MASTER_DIR_PATH(), "server.ini")
-}
-
-func GET_CAVE_DIR_PATH() string {
-	return path.Join(GET_DST_USER_GAME_CONFG_PATH(), "Caves")
-}
-
-func GET_CAVES_DIR_SERVER_INI_PATH() string {
-	return path.Join(GET_CAVE_DIR_PATH(), "server.ini")
-}
-
-func GET_MASTER_LEVELDATAOVERRIDE_PATH() string {
-	return path.Join(GET_DST_USER_GAME_CONFG_PATH(), "Master", "leveldataoverride.lua")
-}
-
-func GET_CAVES_LEVELDATAOVERRIDE_PATH() string {
-	return path.Join(GET_DST_USER_GAME_CONFG_PATH(), "Caves", "leveldataoverride.lua")
-}
-
-func GET_MASTER_MOD_PATH() string {
-	return path.Join(GET_DST_USER_GAME_CONFG_PATH(), "Master", "modoverrides.lua")
-}
-
-func GET_CAVES_MOD_PATH() string {
-	return path.Join(GET_DST_USER_GAME_CONFG_PATH(), "Caves", "modoverrides.lua")
-}
-
-func GET_DST_BACKUP_PATH() string {
-	return dstConfigUtils.GetDstConfig().Backup
-}
-
-func GET_DST_MOD_SETUP_PATH() string {
-	return path.Join(dstConfigUtils.GetDstConfig().Force_install_dir, "mods", "dedicated_server_mods_setup.lua")
+	return filepath.Join(persistent_storage_root, donot_starve_server_directory, cluster)
 }

@@ -51,6 +51,6 @@ func init() {
 	HomePath = home
 	fmt.Println("home path: " + HomePath)
 
-	KleiDstPath = filepath.Join(home, ".klei/DoNotStarveTogether")
+	KleiDstPath = filepath.Join(home, "Documents", "klei", "DoNotStarveTogether")
 
 }

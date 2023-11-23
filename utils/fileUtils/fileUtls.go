@@ -38,7 +38,7 @@ func CreateDir(dirName string) bool {
 	if Exists(dirName) {
 		return false
 	}
-	err := os.Mkdir(dirName, 0755)
+	err := os.MkdirAll(dirName, os.ModePerm)
 	if err != nil {
 		log.Println(err)
 		return false

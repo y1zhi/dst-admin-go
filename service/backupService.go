@@ -115,7 +115,7 @@ func (b *BackupService) CreateBackup(ctx *gin.Context, backupName string) {
 	cluster := clusterUtils.GetClusterFromGin(ctx)
 	backupPath := cluster.Backup
 
-	src := constant.GET_DST_USER_GAME_CONFG_PATH()
+	src := dstUtils.GetClusterBasePath(cluster.ClusterName)
 	if !fileUtils.Exists(backupPath) {
 		log.Panicln("backup path is not exists")
 	}
@@ -201,7 +201,7 @@ func (b *BackupService) GenGameBackUpName(clusterName string) string {
 	days := strconv.Itoa(snapshoot.Clock.Cycles)
 	elapsedDayInSeason := strconv.Itoa(snapshoot.Seasons.ElapsedDaysInSeason)
 	seasonDays := strconv.Itoa(snapshoot.Seasons.ElapsedDaysInSeason + snapshoot.Seasons.RemainingDaysInSeason)
-	archiveDesc := days + "day_" + SeasonMap[snapshoot.Seasons.Season] + "(" + elapsedDayInSeason + "|" + seasonDays + ")"
+	archiveDesc := days + "day_" + SeasonMap[snapshoot.Seasons.Season] + "(" + elapsedDayInSeason + "_" + seasonDays + ")"
 	backupName := time.Now().Format("20060102150405") + "_" + name + "_" + archiveDesc + ".zip"
 
 	return backupName

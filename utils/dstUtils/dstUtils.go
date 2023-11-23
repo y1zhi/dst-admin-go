@@ -8,96 +8,95 @@ import (
 	"dst-admin-go/utils/fileUtils"
 	"dst-admin-go/utils/shellUtils"
 	"html/template"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"path"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
 func GetBlacklistPath(clusterName string) string {
-	return path.Join(constant.HOME_PATH, ".klei", "DoNotStarveTogether", clusterName, "blocklist.txt")
+	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "blocklist.txt")
 }
 
 func GetWhitelistPath(clusterName string) string {
-	return path.Join(constant.HOME_PATH, ".klei", "DoNotStarveTogether", clusterName, "whitelist.txt")
+	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "whitelist.txt")
 }
 
 func GetLevelLeveldataoverridePath(clusterName string, levelName string) string {
-	return path.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether", clusterName, levelName, "leveldataoverride.lua")
+	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, levelName, "leveldataoverride.lua")
 }
 
 func GetLevelModoverridesPath(clusterName string, levelName string) string {
-	return path.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether", clusterName, levelName, "modoverrides.lua")
+	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, levelName, "modoverrides.lua")
 }
 
 func GetLevelServerIniPath(clusterName string, levelName string) string {
-	return path.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether", clusterName, levelName, "server.ini")
+	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, levelName, "server.ini")
 }
 
 func GetLevelServerLogPath(clusterName string, levelName string) string {
-	return path.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether", clusterName, levelName, "server_log.txt")
+	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, levelName, "server_log.txt")
 }
 
 func GetLevelServerChatLogPath(clusterName string, levelName string) string {
-	return path.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether", clusterName, levelName, "server_chat_log.txt")
+	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, levelName, "server_chat_log.txt")
 }
 
 func GetClusterBasePath(clusterName string) string {
-	return path.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether", clusterName)
+	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName)
 }
 
 func GetClusterIniPath(clusterName string) string {
-	return path.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether", clusterName, "cluster.ini")
+	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "cluster.ini")
 }
 
 func GetClusterTokenPath(clusterName string) string {
-	return path.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether", clusterName, "cluster_token.txt")
+	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "cluster_token.txt")
 }
 
 func GetMasterModoverridesPath(clusterName string) string {
-	return path.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether", clusterName, "Master", "modoverrides.lua")
+	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "Master", "modoverrides.lua")
 }
 
 func GetCavesModoverridesPath(clusterName string) string {
-	return path.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether", clusterName, "Caves", "modoverrides.lua")
+	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "Caves", "modoverrides.lua")
 }
 
 func GetMasterLeveldataoverridePath(clusterName string) string {
-	return path.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether", clusterName, "Master", "leveldataoverride.lua")
+	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "Master", "leveldataoverride.lua")
 }
 func GetCavesLeveldataoverridePath(clusterName string) string {
-	return path.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether", clusterName, "Caves", "leveldataoverride.lua")
+	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "Caves", "leveldataoverride.lua")
 }
 
 func GetMasterServerIniPath(clusterName string) string {
-	return path.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether", clusterName, "Master", "server.ini")
+	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "Master", "server.ini")
 }
 
 func GetCavesServerIniPath(clusterName string) string {
-	return path.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether", clusterName, "Master", "server.ini")
+	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "Master", "server.ini")
 }
 
 func GetAdminlistPath(clusterName string) string {
-	return path.Join(constant.HOME_PATH, ".klei", "DoNotStarveTogether", clusterName, "adminlist.txt")
+	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "adminlist.txt")
 }
 
 func GetBlocklistPath(clusterName string) string {
-	return path.Join(constant.HOME_PATH, ".klei", "DoNotStarveTogether", clusterName, "blocklist.txt")
+	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "blocklist.txt")
 }
 
 func GetModSetup(clusterName string) string {
 	cluster := dstConfigUtils.GetDstConfig()
-	return path.Join(cluster.Force_install_dir, "mods", "dedicated_server_mods_setup.lua")
+	return filepath.Join(cluster.Force_install_dir, "mods", "dedicated_server_mods_setup.lua")
 }
 
 func GetDstUpdateCmd(clusterName string) string {
 	cluster := dstConfigUtils.GetDstConfig()
 	steamcmd := cluster.Steamcmd
 	dst_install_dir := cluster.Force_install_dir
-	return "cd " + steamcmd + " ; ./steamcmd.sh +login anonymous +force_install_dir " + dst_install_dir + " +app_update 343050 validate +quit"
+	return "cd /d " + steamcmd + " && Start steamcmd.exe +login anonymous +force_install_dir " + dst_install_dir + " +app_update 343050 validate +quit"
 }
 
 func Status(clusterName, level string) bool {
@@ -116,30 +115,11 @@ func Status(clusterName, level string) bool {
 	return res != ""
 }
 
-func ReadMasterLog(clusterName string, lineNum uint) []string {
-	logPath := path.Join(GetClusterBasePath(clusterName), "Master", "server_log.txt")
-	logs, err := fileUtils.ReverseRead(logPath, lineNum)
-	if err != nil {
-		log.Panicln("read dstUtils2 master log error:", err)
-	}
-	return logs
-}
-
 func ReadLevelLog(clusterName string, levelName string, lineNum uint) []string {
 	logPath := path.Join(GetClusterBasePath(clusterName), levelName, "server_log.txt")
 	logs, err := fileUtils.ReverseRead(logPath, lineNum)
 	if err != nil {
 		log.Panicln("read dstUtils2 master log error:", err)
-	}
-	return logs
-}
-
-func ReadCavesLog(clusterName string, lineNum uint) []string {
-
-	logPath := path.Join(GetClusterBasePath(clusterName), "Caves", "server_log.txt")
-	logs, err := fileUtils.ReverseRead(logPath, lineNum)
-	if err != nil {
-		log.Panicln("read dstUtils2 caves log error:", err)
 	}
 	return logs
 }
@@ -166,21 +146,6 @@ func WorkshopIds(content string) []string {
 		workshopIds = append(workshopIds, workshopId)
 	}
 	return workshopIds
-}
-
-func GetPublicIP() (string, error) {
-	resp, err := http.Get("https://api.ipify.org/")
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	ip, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-
-	return string(ip), nil
 }
 
 func Key(level, clusterName string) string {
@@ -319,5 +284,5 @@ func ParseACFFile(filePath string) map[string]WorkshopItem {
 
 func GetModSetup2(clusterName string) string {
 	cluster := clusterUtils.GetCluster(clusterName)
-	return path.Join(cluster.ForceInstallDir, "mods", "dedicated_server_mods_setup.lua")
+	return filepath.Join(cluster.ForceInstallDir, "mods", "dedicated_server_mods_setup.lua")
 }

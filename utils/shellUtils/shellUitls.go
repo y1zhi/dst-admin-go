@@ -8,9 +8,18 @@ import (
 	"os/exec"
 )
 
+func ExecuteCommandInWin(command string) (string, error) {
+	cmd := exec.Command("cmd", "/C", command)
+	output, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+	return string(output), nil
+}
+
 // ExecuteCommand 执行给定的 Shell 命令，并返回输出和错误（如果有的话）。
 func ExecuteCommand(command string) (string, error) {
-	cmd := exec.Command("sh", "-c", command)
+	cmd := exec.Command("cmd", "/C", command)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out
@@ -28,38 +37,6 @@ func ExecuteCommand(command string) (string, error) {
 
 // 执行shell命令
 func Shell(cmd string) (res string, err error) {
-	//var execCmd *exec.Cmd
-	//if runtime.GOOS == "windows" {
-	//	execCmd = exec.Command("cmd.exe", "/c", cmd)
-	//} else {
-	//	execCmd = exec.Command("bash", "-c", cmd)
-	//}
-	//var (
-	//	stdout bytes.Buffer
-	//	stderr bytes.Buffer
-	//)
-	//
-	//execCmd.Stdout = &stdout
-	//execCmd.Stderr = &stderr
-	//err = execCmd.Run()
-	//if err != nil {
-	//	log.Println("error: " + err.Error())
-	//}
-	//
-	//output := ConvertByte2String(stderr.Bytes(), GB18030)
-	//errput := ConvertByte2String(stdout.Bytes(), GB18030)
-	////res = fmt.Sprintf("Output:\n%s\nError:\n%s", stdout.String(), stderr.String())
-	//
-	//// log.Printf("shell exec: %s \nOutput:\n%s\nError:\n%s", cmd, output, errput)
-	//if errput != "" {
-	//	log.Printf("shell exec: %s Error:\n%s", cmd, errput)
-	//}
-	//if output != "" {
-	//	log.Printf("shell exec: %s nOutput:\n%s", cmd, output)
-	//}
-	//
-	//return stdout.String(), err
-
 	return ExecuteCommand(cmd)
 }
 
