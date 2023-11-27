@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"dst-admin-go/constant/consts"
+	dst_cli_window "dst-admin-go/dst-cli-window"
 	"dst-admin-go/utils/dstUtils"
 	"dst-admin-go/utils/levelConfigUtils"
 	"dst-admin-go/utils/systemUtils"
@@ -14,7 +15,6 @@ import (
 	"strconv"
 	"syscall"
 
-	"dst-admin-go/constant/screenKey"
 	"dst-admin-go/utils/clusterUtils"
 	"dst-admin-go/utils/fileUtils"
 	"dst-admin-go/utils/shellUtils"
@@ -130,67 +130,21 @@ func (g *GameService) shutdownLevel(clusterName, level string) {
 		return
 	}
 
-	shell := "screen -S \"" + screenKey.Key(clusterName, level) + "\" -p 0 -X stuff \"c_shutdown(true)\\n\""
+	shell := "c_shutdown(true)"
 	log.Println("正在shutdown世界", "cluster: ", clusterName, "level: ", level, "command: ", shell)
-	_, err := shellUtils.Shell(shell)
+	_, err := dst_cli_window.DstCliClient.Command(clusterName, level, shell)
 	if err != nil {
 		log.Println("shut down " + clusterName + " " + level + " error: " + err.Error())
 		log.Println("shutdown 失败，将强制杀掉世界")
 	}
 }
 
-/*
-STOP_CAVES_CMD = "ps -ef | grep -v grep |grep '" + DST_CAVES + "' |sed -n '1P'|awk '{print $2}' |xargs kill -9"
-*/
+// TODO 强制kill 掉进程
 func (g *GameService) killLevel(clusterName, level string) {
 
-	if !g.GetLevelStatus(clusterName, level) {
-		return
-	}
-	cmd := " ps -ef | grep -v grep | grep -v tail |grep '" + clusterName + "'|grep " + level + " |sed -n '1P'|awk '{print $2}' |xargs kill -9"
-	log.Println("正在kill世界", "cluster: ", clusterName, "level: ", level, "command: ", cmd)
-	_, err := shellUtils.Shell(cmd)
-	if err != nil {
-		// TODO 强制杀掉
-		log.Println("kill "+clusterName+" "+level+" error: ", err)
-	}
-}
-
-func RunCommandInNewWindow(command string) {
-	// 创建一个命令对象
-	cmd := exec.Command("cmd.exe", "/C", "start", "cmd.exe", "/K", command)
-
-	// 设置新窗口属性
-	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-
-	// 启动命令
-	err := cmd.Start()
-	if err != nil {
-		log.Fatal(err)
-	}
 }
 
 func (g *GameService) LaunchLevel(clusterName, level string, bin, beta int) {
-
-	//cluster := clusterUtils.GetCluster(clusterName)
-	//dstInstallDir := cluster.ForceInstallDir
-	//
-	//var startCmd = ""
-	//
-	//if bin == 64 {
-	//	dstInstallDir = filepath.Join(dstInstallDir, "bin64", "dontstarve_dedicated_server_nullrenderer_x64")
-	//	startCmd = fmt.Sprintf(`cd /d %s && Start "%s%s" dontstarve_dedicated_server_nullrenderer_x64 -console -cluster %s -shard %s`, dstInstallDir, clusterName, level, clusterName, level)
-	//} else {
-	//	dstInstallDir = filepath.Join(dstInstallDir, "bin")
-	//	startCmd = fmt.Sprintf(`cd /d %s && Start "%s%s" "dontstarve_dedicated_server_nullrenderer -console -cluster %s -shard %s"`, dstInstallDir, clusterName, level, clusterName, level)
-	//}
-	//
-	//log.Println("正在启动世界", "cluster: ", clusterName, "level: ", level, "command: ", startCmd)
-	//result, err := shellUtils.ExecuteCommandInWin("cd /d D:\\dst-dedicated-server\\bin && Start dontstarve_dedicated_server_nullrenderer -console -cluster MyDediServer -shard Master")
-	//log.Println("result", result)
-	//if err != nil {
-	//	log.Panicln("启动 "+clusterName+" "+level+" error,", err)
-	//}
 
 	cluster := clusterUtils.GetCluster(clusterName)
 	dstInstallDir := cluster.ForceInstallDir

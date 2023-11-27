@@ -3,6 +3,7 @@ package service
 import (
 	"dst-admin-go/constant"
 	"dst-admin-go/constant/screenKey"
+	dst_cli_window "dst-admin-go/dst-cli-window"
 	"dst-admin-go/utils/dstUtils"
 	"dst-admin-go/utils/fileUtils"
 	"dst-admin-go/utils/shellUtils"
@@ -40,58 +41,40 @@ func (c *GameConsoleService) SentBroadcast2(clusterName string, levelName string
 func (c *GameConsoleService) SentBroadcast(clusterName string, message string) {
 
 	if c.GetLevelStatus(clusterName, "Master") {
-		broadcast := "screen -S \"" + screenKey.Key(clusterName, "Master") + "\" -p 0 -X stuff \"c_announce(\\\""
+		broadcast := "c_announce(\\\""
 		broadcast += message
-		broadcast += "\\\")\\n\""
+		broadcast += "\\\")"
 		log.Println(broadcast)
 		shellUtils.Shell(broadcast)
-	}
 
-	if c.GetLevelStatus(clusterName, "Caves") {
-		broadcast2 := "screen -S \"" + screenKey.Key(clusterName, "Caves") + "\" -p 0 -X stuff \"c_announce(\\\""
-		broadcast2 += message
-		broadcast2 += "\\\")\\n\""
-		log.Println(broadcast2)
-		shellUtils.Shell(broadcast2)
+		dst_cli_window.DstCliClient.Command(clusterName, "Master", broadcast)
 	}
 
 }
 
 func (c *GameConsoleService) KickPlayer(clusterName, KuId string) {
 
-	masterCMD := "screen -S \"" + screenKey.Key(clusterName, "Master") + "\" -p 0 -X stuff \"TheNet:Kick(\\\"" + KuId + "\\\")\\n\""
-	cavesCMD := "screen -S \"" + screenKey.Key(clusterName, "Caves") + "\" -p 0 -X stuff \"TheNet:Kick(\\\"" + KuId + "\\\")\\n\""
+	masterCMD := "TheNet:Kick(\\\"" + KuId + "\\\")"
+	dst_cli_window.DstCliClient.Command(clusterName, "Master", masterCMD)
 
-	shellUtils.Shell(masterCMD)
-	shellUtils.Shell(cavesCMD)
 }
 
 func (c *GameConsoleService) KillPlayer(clusterName, KuId string) {
-	masterCMD := "screen -S \"" + screenKey.Key(clusterName, "Master") + "\" -p 0 -X stuff \"UserToPlayer(\\\"" + KuId + "\\\"):PushEvent('death')\\n\""
-	cavesCMD := "screen -S \"" + screenKey.Key(clusterName, "Caves") + "\" -p 0 -X stuff \"UserToPlayer(\\\"" + KuId + "\\\"):PushEvent('death')\\n\""
-
-	shellUtils.Shell(masterCMD)
-	shellUtils.Shell(cavesCMD)
+	masterCMD := "UserToPlayer(\\\"" + KuId + "\\\"):PushEvent('death')"
+	dst_cli_window.DstCliClient.Command(clusterName, "Master", masterCMD)
 }
 
 func (c *GameConsoleService) RespawnPlayer(clusterName string, KuId string) {
 
-	masterCMD := "screen -S \"" + screenKey.Key(clusterName, "Master") + "\" -p 0 -X stuff \"UserToPlayer(\\\"" + KuId + "\\\"):PushEvent('respawnfromghost')\\n\""
-	cavesCMD := "screen -S \"" + screenKey.Key(clusterName, "Caves") + "\" -p 0 -X stuff \"UserToPlayer(\\\"" + KuId + "\\\"):PushEvent('respawnfromghost')\\n\""
-
-	shellUtils.Shell(masterCMD)
-	shellUtils.Shell(cavesCMD)
+	masterCMD := "UserToPlayer(\\\"" + KuId + "\\\"):PushEvent('respawnfromghost')"
+	dst_cli_window.DstCliClient.Command(clusterName, "Master", masterCMD)
 }
 
 func (c *GameConsoleService) RollBack(clusterName string, dayNum int) {
 	days := fmt.Sprint(dayNum)
-	c.SentBroadcast(clusterName, ":pig 正在回档"+days+"天")
 
-	masterCMD := "screen -S \"" + screenKey.Key(clusterName, "Master") + "\" -p 0 -X stuff \"c_rollback(" + days + ")\\n\""
-	cavesCMD := "screen -S \"" + screenKey.Key(clusterName, "Caves") + "\" -p 0 -X stuff \"c_rollback(" + days + ")\\n\""
-
-	shellUtils.Shell(masterCMD)
-	shellUtils.Shell(cavesCMD)
+	masterCMD := "c_rollback(" + days + ")"
+	dst_cli_window.DstCliClient.Command(clusterName, "Master", masterCMD)
 }
 
 func (c *GameConsoleService) CleanWorld(clusterName string) {
@@ -108,11 +91,8 @@ func (c *GameConsoleService) CleanWorld(clusterName string) {
 func (c *GameConsoleService) Regenerateworld(clusterName string) {
 
 	c.SentBroadcast(clusterName, ":pig 即将重置世界！！！")
-
-	masterCMD := "screen -S \"" + screenKey.Key(clusterName, "Master") + "\" -p 0 -X stuff \"c_regenerateworld()\\n\""
-	cavesCMD := "screen -S \"" + screenKey.Key(clusterName, "Caves") + "\" -p 0 -X stuff \"c_regenerateworld()\\n\""
-	shellUtils.Shell(masterCMD)
-	shellUtils.Shell(cavesCMD)
+	masterCMD := "c_regenerateworld()"
+	dst_cli_window.DstCliClient.Command(clusterName, "Master", masterCMD)
 }
 
 func (c *GameConsoleService) MasterConsole(clusterName string, command string) {
@@ -176,7 +156,5 @@ func (c *GameConsoleService) ReadLevelServerChatLog(clusterName, levelName strin
 }
 
 func (c *GameConsoleService) SendCommand(clusterName string, levelName string, command string) {
-
-	cmd := "screen -S \"" + screenKey.Key(clusterName, levelName) + "\" -p 0 -X stuff \"" + command + "\\n\""
-	shellUtils.Shell(cmd)
+	dst_cli_window.DstCliClient.Command(clusterName, levelName, command)
 }

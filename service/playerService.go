@@ -1,11 +1,10 @@
 package service
 
 import (
-	"dst-admin-go/constant/screenKey"
+	dst_cli_window "dst-admin-go/dst-cli-window"
 	"dst-admin-go/utils/collectionUtils"
 	"dst-admin-go/utils/dstUtils"
 	"dst-admin-go/utils/fileUtils"
-	"dst-admin-go/utils/shellUtils"
 	"dst-admin-go/vo"
 	"log"
 	"strconv"
@@ -25,14 +24,10 @@ func (p *PlayerService) GetPlayerList(clusterName string, levelName string) []vo
 	id := strconv.FormatInt(time.Now().Unix(), 10)
 
 	command := "for i, v in ipairs(TheNet:GetClientTable()) do  print(string.format(\\\"%s %d %s %s %s %s \\\", " + "'" + id + "'" + ",i-1, string.format('%03d', v.playerage), v.userid, v.name, v.prefab)) end"
-
-	playerCMD := "screen -S \"" + screenKey.Key(clusterName, levelName) + "\" -p 0 -X stuff \"" + command + "\\n\""
-
-	shellUtils.Shell(playerCMD)
-
-	time.Sleep(time.Duration(1) * time.Second)
-
-	// TODO 如果只启动了洞穴，应该去读取洞穴的日志
+	_, err := dst_cli_window.DstCliClient.Command(clusterName, levelName, command)
+	if err != nil {
+		return make([]vo.PlayerVO, 0)
+	}
 
 	// 读取日志
 	dstLogs := dstUtils.ReadLevelLog(clusterName, levelName, 100)

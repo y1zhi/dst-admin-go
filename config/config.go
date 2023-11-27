@@ -2,6 +2,7 @@ package config
 
 type Config struct {
 	Port           string `yaml:"port"`
+	DstCliPort     string `yaml:"dstCliPort"`
 	Path           string `yaml:"path"`
 	Db             string `yaml:"database"`
 	Steamcmd       string `yaml:"steamcmd"`
@@ -11,14 +12,4 @@ type Config struct {
 	Flag           string `yaml:"flag"`
 
 	Token string `yaml:"token"`
-
-	AutoCheck struct {
-		MasterInterval     int    `yaml:"masterInterval"`
-		CavesInterval      int    `yaml:"cavesInterval"`
-		MasterModInterval  int    `yaml:"masterModInterval"`
-		CavesModInterval   int    `yaml:"cavesModInterval"`
-		GameUpdateInterval int    `yaml:"gameUpdateInterval"`
-		ModUpdatePrompt    string `yaml:"modUpdatePrompt"`
-		GameUpdatePrompt   string `yaml:"gameUpdatePrompt"`
-	} `yaml:"autoCheck"`
 }
