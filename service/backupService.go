@@ -95,12 +95,12 @@ func (b *BackupService) RestoreBackup(ctx *gin.Context, backupName string) {
 
 	cluster := clusterUtils.GetClusterFromGin(ctx)
 	filePath := filepath.Join(cluster.Backup, backupName)
-	clusterPath := filepath.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether", cluster.ClusterName)
+	clusterPath := filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", cluster.ClusterName)
 	err := fileUtils.DeleteDir(clusterPath)
 	if err != nil {
 		log.Panicln("删除失败,", clusterPath, err)
 	}
-	log.Println("正在恢复存档", filePath, filepath.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether"))
+	log.Println("正在恢复存档", filePath, filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether"))
 
 	// err = zip.Unzip2(filePath, filepath.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether"), cluster.ClusterName)
 	err = zip.Unzip3(filePath, clusterPath)
