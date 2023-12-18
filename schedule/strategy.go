@@ -75,3 +75,17 @@ func (s *RegenerateStrategy) Execute(clusterName string, levelName string) {
 	log.Println("正在定时重置游戏 clusterName: ", clusterName)
 	gameConsoleService.Regenerateworld(clusterName)
 }
+
+type StartGameStrategy struct{}
+
+func (s *StartGameStrategy) Execute(clusterName string, levelName string) {
+	log.Println("正在定时启动游戏(所有) clusterName: ", clusterName)
+	gameService.StartGame(clusterName)
+}
+
+type StopGameStrategy struct{}
+
+func (s *StopGameStrategy) Execute(clusterName string, levelName string) {
+	log.Println("正在定时关闭游戏(所有) clusterName: ", clusterName)
+	gameService.StopGame(clusterName)
+}

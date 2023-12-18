@@ -56,6 +56,7 @@ func initDB() {
 		&model.AutoCheck{},
 		&model.Announce{},
 		&model.WebLink{},
+		&model.LogRecord{},
 	)
 	if err != nil {
 		return

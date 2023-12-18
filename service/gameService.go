@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"dst-admin-go/constant/consts"
 	dst_cli_window "dst-admin-go/dst-cli-window"
+	"dst-admin-go/model"
 	"dst-admin-go/utils/dstUtils"
 	"dst-admin-go/utils/levelConfigUtils"
 	"dst-admin-go/utils/systemUtils"
@@ -27,8 +28,9 @@ import (
 )
 
 type GameService struct {
-	lock sync.Mutex
-	c    HomeService
+	lock      sync.Mutex
+	c         HomeService
+	logRecord LogRecordService
 }
 
 func (g *GameService) GetLastDstVersion() int64 {
@@ -53,11 +55,13 @@ func (g *GameService) GetLastDstVersion() int64 {
 func (g *GameService) GetLocalDstVersion(clusterName string) int64 {
 	cluster := clusterUtils.GetCluster(clusterName)
 	versionTextPath := filepath.Join(cluster.ForceInstallDir, "version.txt")
+	log.Println("versionTextPath", versionTextPath)
 	version, err := fileUtils.ReadFile(versionTextPath)
 	if err != nil {
 		log.Println(err)
 		return 0
 	}
+	version = strings.Replace(version, "\r", "", -1)
 	version = strings.Replace(version, "\n", "", -1)
 	l, err := strconv.ParseInt(version, 10, 64)
 	if err != nil {
@@ -146,6 +150,8 @@ func (g *GameService) killLevel(clusterName, level string) {
 
 func (g *GameService) LaunchLevel(clusterName, level string, bin, beta int) {
 
+	g.logRecord.RecordLog(clusterName, level, model.RUN)
+
 	cluster := clusterUtils.GetCluster(clusterName)
 	dstInstallDir := cluster.ForceInstallDir
 	command := ""
@@ -174,6 +180,9 @@ func (g *GameService) LaunchLevel(clusterName, level string, bin, beta int) {
 }
 
 func (g *GameService) StopLevel(clusterName, level string) {
+
+	g.logRecord.RecordLog(clusterName, level, model.STOP)
+
 	g.shutdownLevel(clusterName, level)
 
 	time.Sleep(3 * time.Second)

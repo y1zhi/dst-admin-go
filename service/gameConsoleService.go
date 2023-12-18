@@ -11,6 +11,7 @@ import (
 	"log"
 	"path"
 	"strings"
+	"time"
 )
 
 type GameConsoleService struct {
@@ -29,7 +30,7 @@ func (c *GameConsoleService) ClearScreen() bool {
 func (c *GameConsoleService) SentBroadcast2(clusterName string, levelName string, message string) {
 
 	if c.GetLevelStatus(clusterName, levelName) {
-		broadcast := "screen -S \"" + screenKey.Key(clusterName, "Master") + "\" -p 0 -X stuff \"c_announce(\\\""
+		broadcast := "screen -S \"" + screenKey.Key(clusterName, levelName) + "\" -p 0 -X stuff \"c_announce(\\\""
 		broadcast += message
 		broadcast += "\\\")\\n\""
 		log.Println(broadcast)
@@ -157,4 +158,17 @@ func (c *GameConsoleService) ReadLevelServerChatLog(clusterName, levelName strin
 
 func (c *GameConsoleService) SendCommand(clusterName string, levelName string, command string) {
 	dst_cli_window.DstCliClient.Command(clusterName, levelName, command)
+}
+
+func (c *GameConsoleService) CSave(clusterName string, levelName string) {
+	log.Println("正在 s_save() 存档", clusterName, levelName)
+	command := "c_save()"
+	cmd := "screen -S \"" + screenKey.Key(clusterName, levelName) + "\" -p 0 -X stuff \"" + command + "\\n\""
+	shellUtils.Shell(cmd)
+
+	time.Sleep(5 * time.Second)
+}
+
+func (c *GameConsoleService) CSaveMaster(clusterName string) {
+	c.CSave(clusterName, "Master")
 }

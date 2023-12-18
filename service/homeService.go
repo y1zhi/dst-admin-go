@@ -196,7 +196,7 @@ func (c *HomeService) SaveClusterToken(clusterName, token string) {
 
 func (c *HomeService) SaveClusterIni(clusterName string, cluster *level.ClusterIni) {
 	clusterIniPath := dstUtils.GetClusterIniPath(clusterName)
-	fileUtils.WriterTXT(clusterIniPath, dstUtils.ParseTemplate(ClusterIniTemplate, cluster))
+	fileUtils.WriterTXT(clusterIniPath, dstUtils.ParseTemplate2(ClusterIniTemplate, cluster))
 }
 
 func (c *HomeService) SaveAdminlist(clusterName string, str []string) {
