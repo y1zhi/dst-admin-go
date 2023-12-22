@@ -30,11 +30,11 @@ func (c *GameConsoleService) ClearScreen() bool {
 func (c *GameConsoleService) SentBroadcast2(clusterName string, levelName string, message string) {
 
 	if c.GetLevelStatus(clusterName, levelName) {
-		broadcast := "screen -S \"" + screenKey.Key(clusterName, levelName) + "\" -p 0 -X stuff \"c_announce(\\\""
+		broadcast := "c_announce(\\\""
 		broadcast += message
-		broadcast += "\\\")\\n\""
+		broadcast += "\\\")"
 		log.Println(broadcast)
-		shellUtils.Shell(broadcast)
+		dst_cli_window.DstCliClient.Command(clusterName, levelName, broadcast)
 	}
 
 }
