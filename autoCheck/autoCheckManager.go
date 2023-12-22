@@ -11,6 +11,7 @@ import (
 	"dst-admin-go/utils/dstUtils"
 	"dst-admin-go/utils/fileUtils"
 	"dst-admin-go/utils/levelConfigUtils"
+	"dst-admin-go/utils/systemUtils"
 	"encoding/json"
 	"io"
 	"log"
@@ -73,7 +74,8 @@ func (m *AutoCheckManager) Start() {
 
 	for {
 		dstConfig := dstConfigUtils.GetDstConfig()
-		kleiPath := filepath.Join(constant.HOME_PATH, ".klei", "DoNotStarveTogether")
+		log.Println(systemUtils.GetHostInfo())
+		kleiPath := filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether")
 		baseLevelPath := filepath.Join(kleiPath, dstConfig.Cluster)
 		if !fileUtils.Exists(baseLevelPath) {
 			time.Sleep(1 * time.Minute)
@@ -202,7 +204,7 @@ func (m *AutoCheckManager) check(task *model.AutoCheck) {
 		task = m.GetAutoCheck(task.ClusterName, task.CheckType, task.Uuid)
 	}
 
-	// log.Println("开始检查", task.ClusterName, task.LevelName, task.CheckType, task.Enable)
+	log.Println("开始检查", task.ClusterName, task.LevelName, task.CheckType, task.Enable)
 	if task.Enable != 1 {
 		time.Sleep(10 * time.Second)
 	} else {

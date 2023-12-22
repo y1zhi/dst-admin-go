@@ -57,6 +57,7 @@ func initDB() {
 		&model.Announce{},
 		&model.WebLink{},
 		&model.LogRecord{},
+		&model.KV{},
 	)
 	if err != nil {
 		return
@@ -111,9 +112,17 @@ func initCollect() {
 
 	// autoCheck.AutoCheckObject = autoCheck.NewAutoCheckConfig(clusterName, dstConfig.Bin, dstConfig.Beta)
 
-	autoCheckManager := autoCheck.AutoCheckManager{}
-	autoCheckManager.Start()
-	autoCheck.Manager = &autoCheckManager
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Println(">>>>>>>>")
+				log.Println(r)
+			}
+		}()
+		autoCheckManager := autoCheck.AutoCheckManager{}
+		autoCheckManager.Start()
+		autoCheck.Manager = &autoCheckManager
+	}()
 }
 
 func initSchedule() {
