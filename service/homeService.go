@@ -53,7 +53,7 @@ func (c *HomeService) GetClusterIni(clusterName string) *level.ClusterIni {
 	newCluster.ClusterDescription = NETWORK.Key("cluster_description").String()
 	newCluster.ClusterName = NETWORK.Key("cluster_name").String()
 	newCluster.OfflineCluster = NETWORK.Key("offline_cluster").MustBool(false)
-	newCluster.ClusterLanguage = NETWORK.Key("cluster_language").String()
+	newCluster.ClusterLanguage = NETWORK.Key("cluster_language").MustString("zh")
 	newCluster.WhitelistSlots = NETWORK.Key("whitelist_slots").MustUint(0)
 	newCluster.TickRate = NETWORK.Key("tick_rate").MustUint(15)
 
@@ -75,9 +75,9 @@ func (c *HomeService) GetClusterIni(clusterName string) *level.ClusterIni {
 	// [STEAM]
 	STEAM := cfg.Section("STEAM")
 
-	newCluster.SteamGroupOnly = STEAM.Key("steam_group_only").MustBool(false)
 	newCluster.SteamGroupId = STEAM.Key("steam_group_id").MustString("")
-	newCluster.SteamGroupAdmins = STEAM.Key("steam_group_admins").MustString("")
+	newCluster.SteamGroupOnly = STEAM.Key("steam_group_only").MustBool(false)
+	newCluster.SteamGroupAdmins = STEAM.Key("steam_group_admins").MustBool(false)
 
 	return newCluster
 }
