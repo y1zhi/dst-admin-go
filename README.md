@@ -1,9 +1,19 @@
 # dst-admin-go
-> 饥荒联机版管理后台Go版本
+> 饥荒联机版管理后台
 >
-> Date: 2023/05/11
 
-使用go编写的饥荒管理面板,部署简单,占用内存少,界面美观,操作简单,提供可视化界面操作房间配置和模组在线配置,支持多房间管理
+
+
+**Now，Support Windows and Linux  platform**
+
+**现已支持 windows 和 Linux 平台**
+
+This is a management panel for Don't Starve Together, developed in Go. It offers simple deployment, low memory usage, an aesthetically pleasing interface, and user-friendly operations. The panel provides a visual interface for easily configuring game rooms and managing online mods. It also supports the management of multiple rooms. All of these features are designed to provide a smoother and more streamlined user experience.
+
+使用go编写的饥荒管理面板,部署简单,占用内存少,界面美观,操作简单,提供可视化界面操作房间配置和模组在线配置,支持多房间管理，备份快照等功能
+
+新增 **暗黑主题**，**国际化**，支持**多层世界**，支持更大屏幕显示
+
 ## 部署
 注意目录必须要有读写权限。
 
@@ -52,3 +62,4 @@ set GOOS=linux
 
 go build
 ```
+
