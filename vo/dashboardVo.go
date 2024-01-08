@@ -1,7 +1,7 @@
 package vo
 
 import (
-	"dst-admin-go/constant"
+	"dst-admin-go/constant/consts"
 	"dst-admin-go/utils/systemUtils"
 	"path/filepath"
 )
@@ -26,7 +26,7 @@ type ClusterDashboardVO struct {
 
 func NewDashboardVO(clusterName string) *ClusterDashboardVO {
 	return &ClusterDashboardVO{
-		MasterLog: filepath.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether", clusterName, "Master", "server_log.txt"),
-		CavesLog:  filepath.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether", clusterName, "Caves", "server_log.txt"),
+		MasterLog: filepath.Join(consts.KleiDstPath, clusterName, "Master", "server_log.txt"),
+		CavesLog:  filepath.Join(consts.KleiDstPath, clusterName, "Caves", "server_log.txt"),
 	}
 }

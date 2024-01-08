@@ -23,7 +23,7 @@ func (cm *CollectMap) AddNewCollect(clusterName string) {
 		if err != nil {
 			panic("Home path error: " + err.Error())
 		}
-		baseLogPath := filepath.Join(home, ".klei/DoNotStarveTogether", clusterName)
+		baseLogPath := filepath.Join(home, "Documents", "klei", "DoNotStarveTogether", clusterName)
 		collect := NewCollect(baseLogPath, clusterName)
 		collect.StartCollect()
 		cm.cache.Store(clusterName, collect)

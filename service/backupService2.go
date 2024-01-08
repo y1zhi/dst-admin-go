@@ -3,6 +3,7 @@ package service
 import (
 	"dst-admin-go/config/database"
 	"dst-admin-go/constant"
+	"dst-admin-go/constant/consts"
 	"dst-admin-go/model"
 	"dst-admin-go/utils/clusterUtils"
 	"dst-admin-go/utils/dstConfigUtils"
@@ -124,7 +125,7 @@ func (this *BackupService2) RestoreBackup(ctx *gin.Context, backupName string) {
 	filePath := path.Join(cluster.Backup, backupName)
 	log.Println("filepath", filePath)
 
-	clusterPath := path.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether", cluster.ClusterName)
+	clusterPath := path.Join(consts.KleiDstPath, cluster.ClusterName)
 	err := fileUtils.DeleteDir(clusterPath)
 	if err != nil {
 		return

@@ -154,6 +154,10 @@ func (g *GameService) LaunchLevel(clusterName, level string, bin, beta int) {
 
 	cluster := clusterUtils.GetCluster(clusterName)
 	dstInstallDir := cluster.ForceInstallDir
+	ugcDirectory := cluster.Ugc_directory
+	persistent_storage_root := cluster.Persistent_storage_root
+	conf_dir := cluster.Conf_dir
+
 	command := ""
 	title := cluster.ClusterName + "_" + level
 	if bin == 64 {
@@ -162,6 +166,16 @@ func (g *GameService) LaunchLevel(clusterName, level string, bin, beta int) {
 	} else {
 		dstInstallDir = filepath.Join(dstInstallDir, "bin")
 		command = "cd /d " + dstInstallDir + " && Start \"" + title + "\" dontstarve_dedicated_server_nullrenderer -console -cluster " + clusterName + " -shard " + level
+	}
+
+	if ugcDirectory != "" {
+		command += " -ugc_directory " + ugcDirectory
+	}
+	if persistent_storage_root != "" {
+		command += " -persistent_storage_root " + persistent_storage_root
+	}
+	if conf_dir != "" {
+		command += " -conf_dir " + conf_dir
 	}
 
 	// 创建一个命令对象

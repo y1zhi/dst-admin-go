@@ -2,7 +2,7 @@ package api
 
 import (
 	"dst-admin-go/autoCheck"
-	"dst-admin-go/constant"
+	"dst-admin-go/constant/consts"
 	"dst-admin-go/utils/clusterUtils"
 	"dst-admin-go/utils/dstUtils"
 	"dst-admin-go/utils/fileUtils"
@@ -36,11 +36,11 @@ func (p *PreinstallApi) UsePreinstall(ctx *gin.Context) {
 	if err != nil {
 		log.Panicln(err)
 	}
-	err = fileUtils.Copy("./static/preinstall/"+name, filepath.Join(constant.HOME_PATH, ".klei", "DoNotStarveTogether"))
+	err = fileUtils.Copy("./static/preinstall/"+name, consts.KleiDstPath)
 	if err != nil {
 		log.Panicln(err)
 	}
-	fileUtils.Rename(filepath.Join(constant.HOME_PATH, ".klei", "DoNotStarveTogether", name), dstUtils.GetClusterBasePath(cluster.ClusterName))
+	fileUtils.Rename(filepath.Join(consts.KleiDstPath, name), dstUtils.GetClusterBasePath(cluster.ClusterName))
 
 	// TODO 宕机恢复重新读取
 	autoCheck.Manager.ReStart(cluster.ClusterName)
