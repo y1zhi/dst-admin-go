@@ -1,14 +1,12 @@
 package service
 
 import (
-	"bytes"
 	"dst-admin-go/constant/consts"
 	dst_cli_window "dst-admin-go/dst-cli-window"
 	"dst-admin-go/model"
 	"dst-admin-go/utils/dstUtils"
 	"dst-admin-go/utils/levelConfigUtils"
 	"dst-admin-go/utils/systemUtils"
-	"fmt"
 	"io"
 	"net/http"
 	"os/exec"
@@ -103,30 +101,35 @@ func (g *GameService) UpdateGame(clusterName string) error {
 }
 
 func (g *GameService) GetLevelStatus(clusterName, level string) bool {
-	start := time.Now().Nanosecond()
-	// 替换为你要查找的窗口标题
-	targetWindowTitle := clusterName + "_" + level
 
-	// 构建 PowerShell 命令
-	psCommand := fmt.Sprintf("Get-Process | Where-Object { $_.MainWindowTitle -eq '%s' } | Format-Table -Property Id, ProcessName, MainWindowTitle", targetWindowTitle)
-
-	// 执行 PowerShell 命令
-	cmd := exec.Command("powershell", "-Command", psCommand)
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	err := cmd.Run()
+	//start := time.Now().Nanosecond()
+	//// 替换为你要查找的窗口标题
+	//targetWindowTitle := clusterName + "_" + level
+	//
+	//// 构建 PowerShell 命令
+	//psCommand := fmt.Sprintf("Get-Process | Where-Object { $_.MainWindowTitle -eq '%s' } | Format-Table -Property Id, ProcessName, MainWindowTitle", targetWindowTitle)
+	//
+	//// 执行 PowerShell 命令
+	//cmd := exec.Command("powershell", "-Command", psCommand)
+	//var out bytes.Buffer
+	//cmd.Stdout = &out
+	//err := cmd.Run()
+	//if err != nil {
+	//	fmt.Println("Error executing PowerShell command:", err)
+	//	return false
+	//}
+	//
+	//// 打印输出结果
+	//// fmt.Println(out.String())
+	//// log.Println("查询世界状态", cmd, out.String(), out.String() != "")
+	//end := time.Now().Nanosecond()
+	//log.Println("消耗时间:", (start-end)/1000)
+	//return out.String() != ""
+	status, err := dst_cli_window.DstCliClient.DstStatus(clusterName, level)
 	if err != nil {
-		fmt.Println("Error executing PowerShell command:", err)
 		return false
 	}
-
-	// 打印输出结果
-	// fmt.Println(out.String())
-	// log.Println("查询世界状态", cmd, out.String(), out.String() != "")
-	end := time.Now().Nanosecond()
-	log.Println("消耗时间:", (start-end)/1000)
-	return out.String() != ""
-
+	return status.Status
 }
 
 func (g *GameService) shutdownLevel(clusterName, level string) {
