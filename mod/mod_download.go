@@ -12,9 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"os"
-	"path"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -70,8 +68,8 @@ func get_dst_ucgs_mods_installed_path(modid string) (string, bool) {
 	// 先从 mods 文件读取
 
 	dstConfig := dstConfigUtils.GetDstConfig()
-	masterModFilePath := path.Join(dstConfig.Force_install_dir, "ugc_mods", dstConfig.Cluster, "Master", "content", "322330", modid)
-	caveModFilePath := path.Join(dstConfig.Force_install_dir, "ugc_mods", dstConfig.Cluster, "Caves", "content", "322330", modid)
+	masterModFilePath := filepath.Join(dstConfig.Force_install_dir, "ugc_mods", dstConfig.Cluster, "Master", "content", "322330", modid)
+	caveModFilePath := filepath.Join(dstConfig.Force_install_dir, "ugc_mods", dstConfig.Cluster, "Caves", "content", "322330", modid)
 
 	log.Println("masterModFilePath: ", masterModFilePath)
 	log.Println("caveModFilePath: ", caveModFilePath)
@@ -101,17 +99,15 @@ func get_mod_info_config(mod_id string) map[string]interface{} {
 	mod_download_path := dstConfig.Mod_download_path
 	fileUtils.CreateFileIfNotExists(mod_download_path)
 	// 下载的模组位置
-	mod_path := path.Join(mod_download_path, "steamapps", "workshop", "content", "322330", mod_id)
+	mod_path := filepath.Join(mod_download_path, "steamapps", "workshop", "content", "322330", mod_id)
 	if _, err := os.Stat(mod_path); err == nil {
 		fmt.Println("Mod already downloaded to:", mod_path)
 	} else {
 		// 调用 SteamCMD 命令下载 mod
 		steamcmd := dstConfig.Steamcmd
-		output, err := shellUtils.ExecuteCommandInWin("cd /d " + steamcmd + "&& steamcmd " + "+login anonymous" + "+force_install_dir" + mod_download_path + "+workshop_download_item 322330 " + mod_id + "+quit")
-
-		//cmd := exec.Command(path.Join(steamcmd, "steamcmd.sh"), "+login anonymous", "+force_install_dir", mod_download_path, "+workshop_download_item 322330 "+mod_id, "+quit")
-		//log.Println("正在现在模组 command: ", cmd)
-		//output, err := cmd.CombinedOutput()
+		cmd := "cd /d " + steamcmd + " && Start steamcmd.exe +login anonymous +force_install_dir " + mod_download_path + " +workshop_download_item 322330 " + mod_id + " +quit"
+		log.Println("steamcmd download mod ", cmd)
+		_, err := shellUtils.ExecuteCommandInWin(cmd)
 
 		if err != nil {
 			log.Panicln("下载mod失败，请检查steamcmd路径是否配置正确", err)
@@ -119,21 +115,21 @@ func get_mod_info_config(mod_id string) map[string]interface{} {
 		}
 
 		// 解析 SteamCMD 输出，提取 mod 文件路径
-		re := regexp.MustCompile(`Downloaded item \d+ to "([^"]+)"`)
-		match := re.FindStringSubmatch(string(output))
-		if len(match) < 2 {
-			fmt.Println("Error parsing output")
-			log.Println(string(output))
-			return make(map[string]interface{})
-		}
-		path := match[1]
-		fmt.Println("Mod downloaded to:", path)
+		//re := regexp.MustCompile(`Downloaded item \d+ to "([^"]+)"`)
+		//match := re.FindStringSubmatch(output)
+		//if len(match) < 2 {
+		//	fmt.Println("Error parsing output")
+		//	log.Println(string(output))
+		//	return make(map[string]interface{})
+		//}
+		//path := match[1]
+		//fmt.Println("Mod downloaded to:", path)
 	}
 
 	// 查找 modinfo.lua 文件
 	modinfo_path := filepath.Join(mod_path, "modinfo.lua")
 	if _, err := os.Stat(modinfo_path); err != nil {
-		fmt.Println("Error finding modinfo.lua:", err)
+		fmt.Println("Error finding modinfo.lua:", modinfo_path, err)
 		return make(map[string]interface{})
 	}
 	return read_mod_info(mod_id, modinfo_path)
