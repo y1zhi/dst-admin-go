@@ -1,7 +1,6 @@
 package service
 
 import (
-	"dst-admin-go/constant"
 	"dst-admin-go/utils/dstConfigUtils"
 	"dst-admin-go/utils/dstUtils"
 	"dst-admin-go/utils/fileUtils"
@@ -163,8 +162,7 @@ func (c *GameConfigService) SaveConfig(clusterName string, gameConfigVo vo.GameC
 
 func (c *GameConfigService) createMyDediServerDir() {
 	dstConfig := dstConfigUtils.GetDstConfig()
-	basePath := constant.GET_DST_USER_GAME_CONFG_PATH()
-	myDediServerPath := path.Join(basePath, dstConfig.Cluster)
+	myDediServerPath := path.Join(dstUtils.GetKleiDstPath(), dstConfig.Cluster)
 	log.Println("生成 myDediServer 目录：" + myDediServerPath)
 	fileUtils.CreateDir(myDediServerPath)
 }

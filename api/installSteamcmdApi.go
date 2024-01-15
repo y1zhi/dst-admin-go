@@ -5,6 +5,7 @@ import (
 	"dst-admin-go/autoCheck"
 	"dst-admin-go/constant/consts"
 	"dst-admin-go/utils/dstConfigUtils"
+	"dst-admin-go/utils/dstUtils"
 	"dst-admin-go/utils/shellUtils"
 	"dst-admin-go/utils/systemUtils"
 	"errors"
@@ -212,8 +213,8 @@ func saveDstConfig() {
 	config := dstConfigUtils.GetDstConfig()
 	config.Steamcmd = filepath.Join(consts.HomePath, "steamcmd")
 	config.Force_install_dir = filepath.Join(consts.HomePath, "dst-dedicated-server")
-	config.Backup = consts.KleiDstPath
-	config.Mod_download_path = consts.KleiDstPath
+	config.Backup = dstUtils.GetKleiDstPath()
+	config.Mod_download_path = dstUtils.GetKleiDstPath()
 	config.Cluster = "MyDediServer"
 
 	dstConfigUtils.SaveDstConfig(&config)

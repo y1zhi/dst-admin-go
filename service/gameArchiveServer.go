@@ -1,7 +1,6 @@
 package service
 
 import (
-	"dst-admin-go/constant/consts"
 	"dst-admin-go/utils/dstUtils"
 	"dst-admin-go/utils/fileUtils"
 	"dst-admin-go/utils/luaUtils"
@@ -221,7 +220,7 @@ func findLatestMetaFile(directory string) (string, error) {
 }
 
 func (d *GameArchive) Snapshoot(clusterName string) vo.Meta {
-	sessionPath := filepath.Join(consts.KleiDstPath, clusterName, "Master", "save", "session")
+	sessionPath := filepath.Join(dstUtils.GetKleiDstPath(), clusterName, "Master", "save", "session")
 	p, err := findLatestMetaFile(sessionPath)
 	if err != nil {
 		fmt.Println("查找meta文件失败", err)

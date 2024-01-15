@@ -1,18 +1,15 @@
 package service
 
 import (
-	"dst-admin-go/constant"
 	"dst-admin-go/model"
 	"dst-admin-go/utils/dstConfigUtils"
 	"dst-admin-go/utils/dstUtils"
 	"dst-admin-go/utils/fileUtils"
 	"dst-admin-go/vo"
 	"dst-admin-go/vo/level"
+	"github.com/gin-gonic/gin"
 	"log"
 	"path/filepath"
-	"runtime"
-
-	"github.com/gin-gonic/gin"
 )
 
 const (
@@ -41,10 +38,10 @@ func (i *InitService) InitDstEnv(initDst *InitDstData, ctx *gin.Context) {
 func (i *InitService) InitDstConfig(dstConfig *dstConfigUtils.DstConfig) {
 
 	if dstConfig.Backup == "" {
-		dstConfig.Backup = filepath.Join(constant.HOME_PATH, ".klei", "DoNotStarveTogether")
+		dstConfig.Backup = filepath.Join(dstUtils.GetKleiDstPath())
 	}
 	if dstConfig.Mod_download_path == "" {
-		dstConfig.Mod_download_path = filepath.Join(constant.HOME_PATH, ".klei", "DoNotStarveTogether", "mod_download")
+		dstConfig.Mod_download_path = filepath.Join(dstUtils.GetKleiDstPath(), "mod_download")
 		fileUtils.CreateDirIfNotExists(dstConfig.Mod_download_path)
 	}
 	dstConfigUtils.SaveDstConfig(dstConfig)
@@ -52,14 +49,7 @@ func (i *InitService) InitDstConfig(dstConfig *dstConfigUtils.DstConfig) {
 
 func (i *InitService) InitBaseLevel(dstConfig *dstConfigUtils.DstConfig, username, token string, exsitesNotInit bool) {
 	clusterName := dstConfig.Cluster
-	klei_path := ""
-	if runtime.GOOS == "windows" {
-		klei_path = filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether")
-	} else {
-		klei_path = filepath.Join(constant.HOME_PATH, ".klei", "DoNotStarveTogether")
-	}
-	baseLevelPath := filepath.Join(klei_path, clusterName)
-
+	baseLevelPath := filepath.Join(dstUtils.GetKleiDstPath(), clusterName)
 	if exsitesNotInit {
 		if fileUtils.Exists(baseLevelPath) {
 			return
@@ -161,7 +151,7 @@ func (i *InitService) InitBaseCaves(basePath string) {
 
 func (i *InitService) InitCluster(cluster *model.Cluster, token string) {
 
-	kleiPath := filepath.Join(constant.HOME_PATH, ".klei", "DoNotStarveTogether")
+	kleiPath := filepath.Join(dstUtils.GetKleiDstPath())
 	baseLevelPath := filepath.Join(kleiPath, cluster.ClusterName)
 	if fileUtils.Exists(baseLevelPath) {
 		return

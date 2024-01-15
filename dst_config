@@ -1,8 +1,8 @@
 steamcmd=D:\steamcmd
 force_install_dir=D:\dst-dedicated-server
 donot_starve_server_directory=
-persistent_storage_root=
-cluster=MyDediServer
+persistent_storage_root=D:\dst_cluster
+cluster=Cluster_1
 backup=C:\Users\paratera\Desktop\我的\饥荒面板\mock\backup
 mod_download_path=C:\Users\paratera\Desktop\我的\饥荒面板\mock\mod_download
 bin=32

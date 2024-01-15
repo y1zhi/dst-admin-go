@@ -2,7 +2,6 @@ package autoCheck
 
 import (
 	"dst-admin-go/config/database"
-	"dst-admin-go/constant"
 	"dst-admin-go/constant/consts"
 	"dst-admin-go/model"
 	"dst-admin-go/service"
@@ -75,8 +74,7 @@ func (m *AutoCheckManager) Start() {
 	for {
 		dstConfig := dstConfigUtils.GetDstConfig()
 		log.Println(systemUtils.GetHostInfo())
-		kleiPath := filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether")
-		baseLevelPath := filepath.Join(kleiPath, dstConfig.Cluster)
+		baseLevelPath := filepath.Join(dstUtils.GetKleiDstPath(), dstConfig.Cluster)
 		if !fileUtils.Exists(baseLevelPath) {
 			time.Sleep(1 * time.Minute)
 		} else {
@@ -204,7 +202,7 @@ func (m *AutoCheckManager) check(task *model.AutoCheck) {
 		task = m.GetAutoCheck(task.ClusterName, task.CheckType, task.Uuid)
 	}
 
-	log.Println("开始检查", task.ClusterName, task.LevelName, task.CheckType, task.Enable)
+	// log.Println("开始检查", task.ClusterName, task.LevelName, task.CheckType, task.Enable)
 	if task.Enable != 1 {
 		time.Sleep(10 * time.Second)
 	} else {
@@ -282,7 +280,6 @@ type LevelModCheck struct{}
 
 func (s *LevelModCheck) Check(clusterName, levelName string) bool {
 	// 找到当前存档的modId, 然后根据判断当前存档的
-	cluster := clusterUtils.GetCluster(clusterName)
 	modoverridesPath := dstUtils.GetLevelModoverridesPath(clusterName, levelName)
 	content, err := fileUtils.ReadFile(modoverridesPath)
 	if err != nil {
@@ -293,7 +290,7 @@ func (s *LevelModCheck) Check(clusterName, levelName string) bool {
 		return true
 	}
 
-	acfPath := filepath.Join(cluster.ForceInstallDir, "ugc_mods", cluster.ClusterName, levelName, "appworkshop_322330.acf")
+	acfPath := dstUtils.GetUgcAcfPath(clusterName, levelName)
 	acfWorkshops := dstUtils.ParseACFFile(acfPath)
 
 	log.Println("acf path: ", acfPath)

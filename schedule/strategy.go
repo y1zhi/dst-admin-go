@@ -1,9 +1,9 @@
 package schedule
 
 import (
-	"dst-admin-go/constant/consts"
 	"dst-admin-go/service"
 	"dst-admin-go/utils/clusterUtils"
+	"dst-admin-go/utils/dstUtils"
 	"dst-admin-go/utils/zip"
 	"log"
 	"path/filepath"
@@ -21,7 +21,7 @@ type BackupStrategy struct{}
 
 func (b *BackupStrategy) Execute(clusterName string, levelName string) {
 	cluster := clusterUtils.GetCluster(clusterName)
-	src := filepath.Join(consts.KleiDstPath, cluster.ClusterName)
+	src := filepath.Join(dstUtils.GetKleiDstPath(), cluster.ClusterName)
 
 	dst := filepath.Join(cluster.Backup, backupService.GenGameBackUpName(clusterName))
 	log.Println("正在定时创建游戏备份", "src: ", src, "dst: ", dst)

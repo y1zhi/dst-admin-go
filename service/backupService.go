@@ -2,8 +2,6 @@ package service
 
 import (
 	"dst-admin-go/config/database"
-	"dst-admin-go/constant"
-	"dst-admin-go/constant/consts"
 	"dst-admin-go/model"
 	"dst-admin-go/utils/clusterUtils"
 	"dst-admin-go/utils/dstConfigUtils"
@@ -95,12 +93,12 @@ func (b *BackupService) RestoreBackup(ctx *gin.Context, backupName string) {
 
 	cluster := clusterUtils.GetClusterFromGin(ctx)
 	filePath := filepath.Join(cluster.Backup, backupName)
-	clusterPath := filepath.Join(consts.KleiDstPath, cluster.ClusterName)
+	clusterPath := filepath.Join(dstUtils.GetClusterBasePath(cluster.ClusterName))
 	err := fileUtils.DeleteDir(clusterPath)
 	if err != nil {
 		log.Panicln("删除失败,", clusterPath, err)
 	}
-	log.Println("正在恢复存档", filePath, filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether"))
+	log.Println("正在恢复存档", filePath, filepath.Join(dstUtils.GetKleiDstPath()))
 
 	// err = zip.Unzip2(filePath, filepath.Join(constant.HOME_PATH, ".klei/DoNotStarveTogether"), cluster.ClusterName)
 	err = zip.Unzip3(filePath, clusterPath)
@@ -123,7 +121,7 @@ func (b *BackupService) CreateBackup(clusterName, backupName string) {
 
 	b.console.CSave(cluster.ClusterName, "Master")
 
-	src := constant.GET_DST_USER_GAME_CONFG_PATH()
+	src := dstUtils.GetKleiDstPath()
 	if !fileUtils.Exists(backupPath) {
 		log.Panicln("backup path is not exists")
 	}
@@ -212,7 +210,7 @@ func (b *BackupService) ScheduleBackupSnapshots() {
 func (b *BackupService) CreateSnapshotBackup(prefix, clusterName string) {
 
 	cluster := clusterUtils.GetCluster(clusterName)
-	src := filepath.Join(consts.KleiDstPath, cluster.ClusterName)
+	src := filepath.Join(dstUtils.GetClusterTokenPath(cluster.ClusterName))
 	dst := filepath.Join(cluster.Backup, b.GenBackUpSnapshotName(prefix, cluster.ClusterName))
 	log.Println("[Snapshot]正在定时创建游戏备份", "src: ", src, "dst: ", dst)
 	err := zip.Zip(src, dst)

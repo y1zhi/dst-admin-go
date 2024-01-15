@@ -2,7 +2,7 @@ package dstUtils
 
 import (
 	"bytes"
-	"dst-admin-go/constant"
+	"dst-admin-go/constant/consts"
 	"dst-admin-go/utils/clusterUtils"
 	"dst-admin-go/utils/dstConfigUtils"
 	"dst-admin-go/utils/fileUtils"
@@ -18,75 +18,107 @@ import (
 	textTemplate "text/template"
 )
 
+func GetUgcModPath() string {
+	dstConfig := dstConfigUtils.GetDstConfig()
+	ugcModPath := ""
+	if dstConfig.Ugc_directory != "" {
+		ugcModPath = dstConfig.Ugc_directory
+	} else {
+		filepath.Join(dstConfig.Force_install_dir, "ugc_mods")
+	}
+	return ugcModPath
+}
+
+func GetUgcAcfPath(clusterName, levelName string) string {
+	ugcModPath := GetUgcModPath()
+	return filepath.Join(ugcModPath, clusterName, levelName, "appworkshop_322330.acf")
+}
+
+func GetKleiDstPath() string {
+	dstConfig := dstConfigUtils.GetDstConfig()
+	confDir := dstConfig.Conf_dir
+	persistentStorageRoot := dstConfig.Persistent_storage_root
+	kleiDstPath := ""
+	if persistentStorageRoot == "" {
+		kleiDstPath = consts.DefaultKleiDstPath
+	} else {
+		if confDir == "" {
+			confDir = "DoNotStarveTogether"
+		}
+		kleiDstPath = filepath.Join(persistentStorageRoot, confDir)
+	}
+	return kleiDstPath
+}
+
 func GetBlacklistPath(clusterName string) string {
-	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "blocklist.txt")
+	return filepath.Join(GetKleiDstPath(), clusterName, "blocklist.txt")
 }
 
 func GetWhitelistPath(clusterName string) string {
-	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "whitelist.txt")
+	return filepath.Join(GetKleiDstPath(), clusterName, "whitelist.txt")
 }
 
 func GetLevelLeveldataoverridePath(clusterName string, levelName string) string {
-	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, levelName, "leveldataoverride.lua")
+	return filepath.Join(GetKleiDstPath(), clusterName, levelName, "leveldataoverride.lua")
 }
 
 func GetLevelModoverridesPath(clusterName string, levelName string) string {
-	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, levelName, "modoverrides.lua")
+	return filepath.Join(GetKleiDstPath(), clusterName, levelName, "modoverrides.lua")
 }
 
 func GetLevelServerIniPath(clusterName string, levelName string) string {
-	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, levelName, "server.ini")
+	return filepath.Join(GetKleiDstPath(), clusterName, levelName, "server.ini")
 }
 
 func GetLevelServerLogPath(clusterName string, levelName string) string {
-	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, levelName, "server_log.txt")
+	return filepath.Join(GetKleiDstPath(), clusterName, levelName, "server_log.txt")
 }
 
 func GetLevelServerChatLogPath(clusterName string, levelName string) string {
-	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, levelName, "server_chat_log.txt")
+	return filepath.Join(GetKleiDstPath(), clusterName, clusterName, levelName, "server_chat_log.txt")
 }
 
 func GetClusterBasePath(clusterName string) string {
-	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName)
+	return filepath.Join(GetKleiDstPath(), clusterName)
 }
 
 func GetClusterIniPath(clusterName string) string {
-	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "cluster.ini")
+	return filepath.Join(GetKleiDstPath(), clusterName, "cluster.ini")
 }
 
 func GetClusterTokenPath(clusterName string) string {
-	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "cluster_token.txt")
+	return filepath.Join(GetKleiDstPath(), clusterName, "cluster_token.txt")
 }
 
 func GetMasterModoverridesPath(clusterName string) string {
-	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "Master", "modoverrides.lua")
+	return filepath.Join(GetKleiDstPath(), clusterName, "Master", "modoverrides.lua")
 }
 
 func GetCavesModoverridesPath(clusterName string) string {
-	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "Caves", "modoverrides.lua")
+	return filepath.Join(GetKleiDstPath(), clusterName, "Caves", "modoverrides.lua")
 }
 
 func GetMasterLeveldataoverridePath(clusterName string) string {
-	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "Master", "leveldataoverride.lua")
+	return filepath.Join(GetKleiDstPath(), clusterName, "Master", "leveldataoverride.lua")
 }
 func GetCavesLeveldataoverridePath(clusterName string) string {
-	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "Caves", "leveldataoverride.lua")
+	return filepath.Join(GetKleiDstPath(), clusterName, "Caves", "leveldataoverride.lua")
 }
 
 func GetMasterServerIniPath(clusterName string) string {
-	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "Master", "server.ini")
+	return filepath.Join(GetKleiDstPath(), clusterName, "Master", "server.ini")
 }
 
 func GetCavesServerIniPath(clusterName string) string {
-	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "Master", "server.ini")
+	return filepath.Join(GetKleiDstPath(), clusterName, "Master", "server.ini")
 }
 
 func GetAdminlistPath(clusterName string) string {
-	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "adminlist.txt")
+	return filepath.Join(GetKleiDstPath(), clusterName, "adminlist.txt")
 }
 
 func GetBlocklistPath(clusterName string) string {
-	return filepath.Join(constant.HOME_PATH, "Documents", "klei", "DoNotStarveTogether", clusterName, "blocklist.txt")
+	return filepath.Join(GetKleiDstPath(), clusterName, "blocklist.txt")
 }
 
 func GetModSetup(clusterName string) string {
@@ -127,7 +159,7 @@ func ReadLevelLog(clusterName string, levelName string, lineNum uint) []string {
 }
 
 func ClearScreen() bool {
-	result, err := shellUtils.Shell(constant.CLEAR_SCREEN_CMD)
+	result, err := shellUtils.Shell("screen -wipe")
 	if err != nil {
 		return false
 	}

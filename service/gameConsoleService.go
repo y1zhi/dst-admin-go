@@ -1,7 +1,6 @@
 package service
 
 import (
-	"dst-admin-go/constant"
 	"dst-admin-go/constant/screenKey"
 	dst_cli_window "dst-admin-go/dst-cli-window"
 	"dst-admin-go/utils/dstUtils"
@@ -19,7 +18,7 @@ type GameConsoleService struct {
 }
 
 func (c *GameConsoleService) ClearScreen() bool {
-	result, err := shellUtils.Shell(constant.CLEAR_SCREEN_CMD)
+	result, err := shellUtils.Shell("screen -wipe")
 	if err != nil {
 		return false
 	}
