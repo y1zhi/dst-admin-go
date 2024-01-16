@@ -38,6 +38,8 @@ func initLevel2(router *gin.RouterGroup) {
 
 		group2.GET("/command", gameLevelApi.SendCommand)
 
+		group2.GET("/udp/port", gameLevelApi.GetScanUDPPorts)
+
 	}
 
 	preinstallApi := api.PreinstallApi{}

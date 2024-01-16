@@ -5,6 +5,7 @@ import (
 	"dst-admin-go/model"
 	"dst-admin-go/utils/clusterUtils"
 	"dst-admin-go/utils/dstConfigUtils"
+	"dst-admin-go/utils/dstUtils"
 	"dst-admin-go/utils/fileUtils"
 	"dst-admin-go/utils/shellUtils"
 	"encoding/json"
@@ -12,6 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -68,8 +70,15 @@ func get_dst_ucgs_mods_installed_path(modid string) (string, bool) {
 	// 先从 mods 文件读取
 
 	dstConfig := dstConfigUtils.GetDstConfig()
-	masterModFilePath := filepath.Join(dstConfig.Force_install_dir, "ugc_mods", dstConfig.Cluster, "Master", "content", "322330", modid)
-	caveModFilePath := filepath.Join(dstConfig.Force_install_dir, "ugc_mods", dstConfig.Cluster, "Caves", "content", "322330", modid)
+	masterModFilePath := ""
+	caveModFilePath := ""
+	if dstConfig.Ugc_directory != "" {
+		masterModFilePath = path.Join(dstUtils.GetUgcModPath(), "content", "322330", modid)
+		caveModFilePath = path.Join(dstUtils.GetUgcModPath(), "content", "322330", modid)
+	} else {
+		masterModFilePath = path.Join(dstConfig.Force_install_dir, "ugc_mods", dstConfig.Cluster, "/Master/content/322330", modid)
+		caveModFilePath = path.Join(dstConfig.Force_install_dir, "ugc_mods", dstConfig.Cluster, "/Caves/content/322330", modid)
+	}
 
 	log.Println("masterModFilePath: ", masterModFilePath)
 	log.Println("caveModFilePath: ", caveModFilePath)

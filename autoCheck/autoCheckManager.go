@@ -10,7 +10,6 @@ import (
 	"dst-admin-go/utils/dstUtils"
 	"dst-admin-go/utils/fileUtils"
 	"dst-admin-go/utils/levelConfigUtils"
-	"dst-admin-go/utils/systemUtils"
 	"encoding/json"
 	"io"
 	"log"
@@ -73,8 +72,8 @@ func (m *AutoCheckManager) Start() {
 
 	for {
 		dstConfig := dstConfigUtils.GetDstConfig()
-		log.Println(systemUtils.GetHostInfo())
-		baseLevelPath := filepath.Join(dstUtils.GetKleiDstPath(), dstConfig.Cluster)
+		kleiPath := filepath.Join(dstUtils.GetKleiDstPath())
+		baseLevelPath := filepath.Join(kleiPath, dstConfig.Cluster)
 		if !fileUtils.Exists(baseLevelPath) {
 			time.Sleep(1 * time.Minute)
 		} else {
@@ -195,7 +194,6 @@ func (m *AutoCheckManager) GetAutoCheck(clusterName, checkType, uuid string) *mo
 	return &autoCheck
 }
 
-// TODO 这里要修改
 func (m *AutoCheckManager) check(task *model.AutoCheck) {
 	// log.Println("开始检查 start", task)
 	if task.Uuid != "" {
@@ -311,11 +309,11 @@ func (s *LevelModCheck) Check(clusterName, levelName string) bool {
 func (s *LevelModCheck) Run(clusterName, levelName string) error {
 	log.Println("正在更新模组 ", clusterName, levelName)
 	SendAnnouncement2(clusterName, levelName, consts.LEVEL_MOD)
-	gameService.StopLevel(clusterName, levelName)
+
 	cluster := clusterUtils.GetCluster(clusterName)
 	bin := cluster.Bin
 	beta := cluster.Beta
-	gameService.LaunchLevel(clusterName, levelName, bin, beta)
+	gameService.StartLevel(clusterName, levelName, bin, beta)
 	return nil
 }
 
@@ -336,13 +334,11 @@ func (s *LevelDownCheck) Check(clusterName, levelName string) bool {
 
 func (s *LevelDownCheck) Run(clusterName, levelName string) error {
 	log.Println("正在启动世界 ", clusterName, levelName)
-	// TODO 加锁
 	if !gameService.GetLevelStatus(clusterName, levelName) {
-		gameService.StopLevel(clusterName, levelName)
 		cluster := clusterUtils.GetCluster(clusterName)
 		bin := cluster.Bin
 		beta := cluster.Beta
-		gameService.LaunchLevel(clusterName, levelName, bin, beta)
+		gameService.StartLevel(clusterName, levelName, bin, beta)
 	}
 	return nil
 }
@@ -359,14 +355,40 @@ func (s *GameUpdateCheck) Check(clusterName, levelName string) bool {
 func (s *GameUpdateCheck) Run(clusterName, levelName string) error {
 	log.Println("正在更新游戏 ", clusterName, levelName)
 	SendAnnouncement2(clusterName, levelName, consts.UPDATE_GAME)
+	err := gameService.UpdateGame(clusterName)
+	if err != nil {
+		return err
+	}
+	time.Sleep(3 * time.Minute)
 
-	return gameService.UpdateGame(clusterName)
+	// 只启动选择的世界
+	levelConfig, err := levelConfigUtils.GetLevelConfig(clusterName)
+	if err != nil {
+		return err
+	}
+	dstConfig := dstConfigUtils.GetDstConfig()
+	for i := range levelConfig.LevelList {
+		item := levelConfig.LevelList[i]
+
+		logRecord := logRecordService.GetLastLog(clusterName, item.File)
+		if logRecord.ID != 0 {
+			if logRecord.Action == model.STOP {
+				continue
+			} else {
+				gameService.StartLevel(clusterName, levelName, dstConfig.Bin, dstConfig.Beta)
+				time.Sleep(30 * time.Second)
+			}
+		}
+	}
+
+	// gameService.StartGame(clusterName)
+	return nil
 }
 
 func SendAnnouncement2(clusterName string, levelName string, checkType string) {
 	db := database.DB
 	autoCheck := model.AutoCheck{}
-	db.Where("cluster_name = ? and uuid = ? and check_type", clusterName, levelName, checkType).Find(&autoCheck)
+	db.Where("cluster_name = ? and uuid = ? and check_type = ?", clusterName, levelName, checkType).Find(&autoCheck)
 	size := autoCheck.Times
 	for i := 0; i < size; i++ {
 		announcement := autoCheck.Announcement

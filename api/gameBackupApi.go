@@ -107,6 +107,7 @@ func (g *GameBackUpApi) SaveBackupSnapshotsSetting(ctx *gin.Context) {
 	oldBackupSnapshot.Enable = backupSnapshot.Enable
 	oldBackupSnapshot.Interval = backupSnapshot.Interval
 	oldBackupSnapshot.MaxSnapshots = backupSnapshot.MaxSnapshots
+	oldBackupSnapshot.IsCSave = backupSnapshot.IsCSave
 
 	db.Save(&oldBackupSnapshot)
 

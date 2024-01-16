@@ -3,6 +3,7 @@ package api
 import (
 	"bufio"
 	"dst-admin-go/autoCheck"
+	"dst-admin-go/config/global"
 	"dst-admin-go/constant/consts"
 	"dst-admin-go/utils/dstConfigUtils"
 	"dst-admin-go/utils/dstUtils"
@@ -213,11 +214,12 @@ func saveDstConfig() {
 	config := dstConfigUtils.GetDstConfig()
 	config.Steamcmd = filepath.Join(consts.HomePath, "steamcmd")
 	config.Force_install_dir = filepath.Join(consts.HomePath, "dst-dedicated-server")
-	config.Backup = dstUtils.GetKleiDstPath()
-	config.Mod_download_path = dstUtils.GetKleiDstPath()
+	config.Backup = consts.DefaultKleiDstPath
+	config.Mod_download_path = consts.DefaultKleiDstPath
 	config.Cluster = "MyDediServer"
 
 	dstConfigUtils.SaveDstConfig(&config)
+	global.Collect.ReCollect(filepath.Join(dstUtils.GetKleiDstPath(), config.Cluster), config.Cluster)
 	autoCheck.Manager.ReStart(config.Cluster)
 	// autoCheck.AutoCheckObject.RestartAutoCheck(config.Cluster, config.Bin, config.Beta)
 

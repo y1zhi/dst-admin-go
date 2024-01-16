@@ -18,20 +18,38 @@ import (
 	textTemplate "text/template"
 )
 
+func GetUgcWorkshopModPath(clusterName, levelName, workshopId string) string {
+	dstConfig := dstConfigUtils.GetDstConfig()
+	workshopModPath := ""
+	if dstConfig.Ugc_directory != "" {
+		workshopModPath = path.Join(GetUgcModPath(), "content", "322330", workshopId)
+	} else {
+		workshopModPath = path.Join(dstConfig.Force_install_dir, "ugc_mods", clusterName, levelName, "content", "322330", workshopId)
+	}
+	return workshopModPath
+}
+
 func GetUgcModPath() string {
 	dstConfig := dstConfigUtils.GetDstConfig()
 	ugcModPath := ""
 	if dstConfig.Ugc_directory != "" {
 		ugcModPath = dstConfig.Ugc_directory
 	} else {
-		filepath.Join(dstConfig.Force_install_dir, "ugc_mods")
+		ugcModPath = filepath.Join(dstConfig.Force_install_dir, "ugc_mods")
 	}
 	return ugcModPath
 }
 
 func GetUgcAcfPath(clusterName, levelName string) string {
 	ugcModPath := GetUgcModPath()
-	return filepath.Join(ugcModPath, clusterName, levelName, "appworkshop_322330.acf")
+	dstConfig := dstConfigUtils.GetDstConfig()
+	p := ""
+	if dstConfig.Ugc_directory == "" {
+		p = filepath.Join(ugcModPath, clusterName, levelName, "appworkshop_322330.acf")
+	} else {
+		p = filepath.Join(ugcModPath, "appworkshop_322330.acf")
+	}
+	return p
 }
 
 func GetKleiDstPath() string {

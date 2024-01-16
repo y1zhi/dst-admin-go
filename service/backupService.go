@@ -121,7 +121,7 @@ func (b *BackupService) CreateBackup(clusterName, backupName string) {
 
 	b.console.CSave(cluster.ClusterName, "Master")
 
-	src := dstUtils.GetKleiDstPath()
+	src := filepath.Join(dstUtils.GetKleiDstPath(), clusterName)
 	if !fileUtils.Exists(backupPath) {
 		log.Panicln("backup path is not exists")
 	}
